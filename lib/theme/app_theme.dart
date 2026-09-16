@@ -78,7 +78,7 @@ class AppColors {
 
 class ThemeController {
   static final ValueNotifier<ThemeMode> themeMode =
-      ValueNotifier<ThemeMode>(ThemeMode.light);
+      ValueNotifier<ThemeMode>(ThemeMode.dark);
 
   static bool isDark(BuildContext context) {
     if (themeMode.value == ThemeMode.system) {

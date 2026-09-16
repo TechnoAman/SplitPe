@@ -6,6 +6,18 @@ import '../widgets/soundbox_speaker_widget.dart';
 import '../widgets/split_checkout_modal.dart';
 import 'qr_scanner_view.dart';
 
+class KiranaPreset {
+  final String title;
+  final double amount;
+  final String icon;
+
+  const KiranaPreset({
+    required this.title,
+    required this.amount,
+    required this.icon,
+  });
+}
+
 class PosCheckoutView extends StatefulWidget {
   final Map<String, String>? initialScannedData;
   const PosCheckoutView({super.key, this.initialScannedData});
@@ -15,14 +27,21 @@ class PosCheckoutView extends StatefulWidget {
 }
 
 class PosCheckoutViewState extends State<PosCheckoutView> {
-  final _amountController = TextEditingController(text: '7500');
+  final _amountController = TextEditingController(text: '3850');
   final _vpaController = TextEditingController(text: '');
   final _nameController = TextEditingController(text: '');
 
   SplitOrder? _currentOrder;
   String? _soundboxAnnouncement;
+  String _selectedPresetTitle = 'Custom Bill';
 
-  final List<double> _quickAmounts = [3500, 5800, 7500, 10000, 15000, 25000];
+  static const List<KiranaPreset> _kiranaPresets = [
+    KiranaPreset(title: '🌾 Atta & Oil', amount: 2450, icon: '🌾'),
+    KiranaPreset(title: '🧈 Dairy & Ghee', amount: 3200, icon: '🧈'),
+    KiranaPreset(title: '🍽️ Dhaba Dinner', amount: 3850, icon: '🍽️'),
+    KiranaPreset(title: '🥜 Dry Fruits', amount: 4500, icon: '🥜'),
+    KiranaPreset(title: '🛒 Full Ration', amount: 7500, icon: '🛒'),
+  ];
 
   @override
   void initState() {
@@ -87,17 +106,17 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
     final vpa = _vpaController.text.trim().isNotEmpty
         ? _vpaController.text.trim()
-        : 'payee@upi';
+        : 'guptakirana@okhdfcbank';
     final name = _nameController.text.trim().isNotEmpty
         ? _nameController.text.trim()
-        : 'Store Checkout';
+        : 'Gupta Kirana & General Store';
 
     setState(() {
       _currentOrder = SplitEngine.createTrancheOrder(
         totalAmount: amt,
         merchantVpa: vpa,
         merchantName: name,
-        note: 'Bill Payment',
+        note: _selectedPresetTitle,
       );
     });
   }
@@ -126,83 +145,85 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     final order = _currentOrder;
     final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
     final trancheCount = (amt / 1999.0).ceil();
-    final potentialSavings = (amt * 0.004).toStringAsFixed(2);
+    final standardFee = (amt * 0.004).toStringAsFixed(2);
+    final perTrancheAmount = trancheCount > 0 ? (amt / trancheCount).toStringAsFixed(2) : '0.00';
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Soundbox Live Broadcast Bar
-          SoundboxSpeakerWidget(
-            announcementText: _soundboxAnnouncement,
-            isPlaying: order?.isFullyPaid ?? false,
-          ),
-
-          const SizedBox(height: 14),
-
-          // Main Setup Card
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: const Color(0xFF141417),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFF27272A), width: 1.0),
-            ),
+    return Column(
+      children: [
+        // Top Scrollable Content Area
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Payee Selector Banner
+                // Soundbox Live Broadcast Bar
+                SoundboxSpeakerWidget(
+                  announcementText: _soundboxAnnouncement,
+                  isPlaying: order?.isFullyPaid ?? false,
+                ),
+
+                const SizedBox(height: 10),
+
+                // Merchant Profile Card
                 InkWell(
                   onTap: scanMerchantQr,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1A1A1E),
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFF141417),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: _vpaController.text.isNotEmpty
                             ? AppColors.primaryGreen.withAlpha(80)
-                            : const Color(0xFF2E2E34),
+                            : const Color(0xFF27272A),
+                        width: 1.0,
                       ),
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          _vpaController.text.isNotEmpty
-                              ? Icons.verified_user_rounded
-                              : Icons.qr_code_scanner_rounded,
-                          size: 20,
-                          color: _vpaController.text.isNotEmpty
-                              ? AppColors.primaryGreen
-                              : AppColors.textSecondary,
+                        Container(
+                          padding: const EdgeInsets.all(7),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF1E2620),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.storefront_rounded,
+                            size: 18,
+                            color: AppColors.primaryGreen,
+                          ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                _nameController.text.isNotEmpty
-                                    ? _nameController.text
-                                    : (_vpaController.text.isNotEmpty
-                                        ? _vpaController.text
-                                        : 'Scan Merchant QR'),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: _vpaController.text.isNotEmpty
-                                      ? Colors.white
-                                      : AppColors.textSecondary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      _nameController.text.isNotEmpty
+                                          ? _nameController.text
+                                          : 'Gupta Kirana & General Store',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Icon(Icons.verified_rounded, color: AppColors.primaryGreen, size: 13),
+                                ],
                               ),
                               Text(
                                 _vpaController.text.isNotEmpty
                                     ? _vpaController.text
-                                    : 'Tap to scan counter standee',
+                                    : 'guptakirana@okhdfcbank',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
@@ -216,16 +237,22 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF25252A),
+                            color: const Color(0xFF222228),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: Text(
-                            _vpaController.text.isNotEmpty ? 'CHANGE' : 'SCAN 📷',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.qr_code_scanner_rounded, size: 11, color: Colors.white),
+                              SizedBox(width: 4),
+                              Text(
+                                'SCAN',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -233,115 +260,251 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   ),
                 ),
 
-                const SizedBox(height: 18),
+                const SizedBox(height: 10),
 
-                const Text(
-                  'BILL AMOUNT',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.0,
-                    color: AppColors.textSecondary,
+                // Bill Amount Input Card
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF141417),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFF27272A), width: 1.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'ENTER BILL AMOUNT',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '₹',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: TextField(
+                              controller: _amountController,
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: -1.0,
+                              ),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                                hintText: '0',
+                                hintStyle: TextStyle(color: Color(0xFF52525B)),
+                              ),
+                              onChanged: (_) {
+                                _selectedPresetTitle = 'Custom Bill';
+                                _recalculateOrder();
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Kirana & Everyday Jugaad Presets
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: _kiranaPresets.map((preset) {
+                            final isSelected = _amountController.text == preset.amount.toStringAsFixed(0);
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: InkWell(
+                                onTap: () {
+                                  _amountController.text = preset.amount.toStringAsFixed(0);
+                                  _selectedPresetTitle = preset.title;
+                                  _recalculateOrder();
+                                },
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.white : const Color(0xFF1E1E24),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: isSelected ? Colors.white : const Color(0xFF2E2E34),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        preset.title,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: isSelected ? Colors.black : Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '₹${preset.amount.toStringAsFixed(0)}',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w800,
+                                          color: isSelected ? Colors.black : AppColors.primaryGreen,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Text(
-                      '₹',
-                      style: TextStyle(
-                        fontSize: 34,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _amountController,
-                        keyboardType: TextInputType.number,
-                        style: const TextStyle(
-                          fontSize: 34,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -1.0,
-                        ),
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: '0',
-                          hintStyle: TextStyle(color: Color(0xFF52525B)),
-                        ),
-                        onChanged: (_) => _recalculateOrder(),
-                      ),
-                    ),
-                  ],
-                ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
-                // Quick Amount Selection Chips
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _quickAmounts.map((qAmt) {
-                      final isSelected = _amountController.text == qAmt.toStringAsFixed(0);
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: InkWell(
-                          onTap: () {
-                            _amountController.text = qAmt.toStringAsFixed(0);
-                            _recalculateOrder();
-                          },
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.white : const Color(0xFF1E1E24),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: isSelected ? Colors.white : const Color(0xFF2E2E34),
-                              ),
+                // THE VIRAL SIDE-BY-SIDE ARBITRAGE COMPARISON CARD
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF111114),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFF27272A)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'NPCI 0.4% ARBITRAGE ENGINE',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: AppColors.textSecondary,
                             ),
-                            child: Text(
-                              '₹${qAmt.toStringAsFixed(0)}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: isSelected ? Colors.black : AppColors.textSecondary,
+                          ),
+                          Text(
+                            '> ₹2,000 CAP',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Comparison Columns
+                      Row(
+                        children: [
+                          // Column 1: Normal GPay / PhonePe
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1A1A1E),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: const Color(0xFF2E2E34)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    '❌ Normal UPI',
+                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '+₹$standardFee Fee',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFFF43F5E),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
 
-                const SizedBox(height: 18),
+                          const SizedBox(width: 8),
 
-                // MDR Arbitrage Info Banner (Responsive, no overflow)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF18181D),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFF27272A)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.bolt, color: AppColors.primaryGreen, size: 16),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          'Splits into $trancheCount tranches',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                          // Column 2: SplitPe Zero-MDR
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF16251C),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.primaryGreen.withAlpha(80)),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '⚡ $trancheCount Splits (~₹$perTrancheAmount)',
+                                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.primaryGreen),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    '₹0.00 (100% Free)',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.primaryGreen,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        'Saves ₹$potentialSavings MDR',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen),
+
+                      const SizedBox(height: 8),
+
+                      // Net Surcharge Saved Highlight
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1B2A20),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Total Surcharge Saved',
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white),
+                            ),
+                            Text(
+                              '+₹$standardFee',
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -349,13 +512,20 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
               ],
             ),
           ),
+        ),
 
-          const SizedBox(height: 16),
-
-          // Primary Launch Checkout Dialog Action
-          SizedBox(
+        // Sticky Bottom CTA (ALWAYS Visible, Never Hidden, No Scrolling Needed!)
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+          decoration: const BoxDecoration(
+            color: Color(0xFF0F0F12),
+            border: Border(
+              top: BorderSide(color: Color(0xFF202024), width: 1.0),
+            ),
+          ),
+          child: SizedBox(
             width: double.infinity,
-            height: 52,
+            height: 50,
             child: ElevatedButton(
               onPressed: _openCheckoutDialog,
               style: ElevatedButton.styleFrom(
@@ -366,79 +536,24 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: Text(
-                'Proceed to Pay ₹${amt.toStringAsFixed(0)} (0% MDR)',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.bolt, color: Colors.black, size: 20),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Bypass ₹$standardFee Fee · Pay on UPI',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-
-          if (order != null && order.paidAmount > 0) ...[
-            const SizedBox(height: 14),
-            // Active Payment Status Bar
-            InkWell(
-              onTap: _openCheckoutDialog,
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF16161A),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF27272A)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          order.isFullyPaid ? Icons.check_circle_rounded : Icons.timelapse_rounded,
-                          color: order.isFullyPaid ? AppColors.primaryGreen : AppColors.goldenYellow,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              order.isFullyPaid ? 'Bill Fully Settled' : 'Payment in Progress',
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
-                            ),
-                            Text(
-                              '₹${order.paidAmount.toStringAsFixed(0)} / ₹${order.totalAmount.toStringAsFixed(0)} Settled',
-                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF25252A),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        'RESUME →',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -11,10 +11,7 @@ class KiranaPreset {
   final String title;
   final double amount;
 
-  const KiranaPreset({
-    required this.title,
-    required this.amount,
-  });
+  const KiranaPreset({required this.title, required this.amount});
 }
 
 class PosCheckoutView extends StatefulWidget {
@@ -76,7 +73,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     setState(() {
       if (vpa.isNotEmpty) _vpaController.text = vpa;
       if (name.isNotEmpty) _nameController.text = Uri.decodeComponent(name);
-      if (am.isNotEmpty && double.tryParse(am) != null && double.parse(am) > 0) {
+      if (am.isNotEmpty &&
+          double.tryParse(am) != null &&
+          double.parse(am) > 0) {
         _amountController.text = double.parse(am).toStringAsFixed(0);
       }
       _recalculateOrder();
@@ -98,7 +97,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
   void _showUpiInputDialog() {
     final tempVpaController = TextEditingController(text: _vpaController.text);
-    final tempNameController = TextEditingController(text: _nameController.text);
+    final tempNameController = TextEditingController(
+      text: _nameController.text,
+    );
 
     showModalBottomSheet(
       context: context,
@@ -136,7 +137,11 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(ctx),
-                    icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                    icon: const Icon(
+                      Icons.close,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -156,7 +161,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
               ),
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black,
                   border: Border.all(color: AppColors.neoBorder, width: 1.2),
@@ -171,7 +179,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   ),
                   decoration: const InputDecoration(
                     hintText: 'e.g. guptakirana@okhdfcbank',
-                    hintStyle: TextStyle(color: Color(0xFF4A4E5C), fontSize: 13),
+                    hintStyle: TextStyle(
+                      color: Color(0xFF4A4E5C),
+                      fontSize: 13,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -188,7 +199,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                       padding: const EdgeInsets.only(right: 6),
                       child: InkWell(
                         onTap: () {
-                          final current = tempVpaController.text.split('@').first;
+                          final current = tempVpaController.text
+                              .split('@')
+                              .first;
                           if (current.isNotEmpty) {
                             tempVpaController.text = '$current$handle';
                           } else {
@@ -197,7 +210,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                           setModalState(() {});
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1B1C22),
                             border: Border.all(color: const Color(0xFF2E303A)),
@@ -231,7 +247,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
               ),
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black,
                   border: Border.all(color: AppColors.neoBorder, width: 1.2),
@@ -245,7 +264,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   ),
                   decoration: const InputDecoration(
                     hintText: 'e.g. Gupta Kirana Store',
-                    hintStyle: TextStyle(color: Color(0xFF4A4E5C), fontSize: 13),
+                    hintStyle: TextStyle(
+                      color: Color(0xFF4A4E5C),
+                      fontSize: 13,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -268,7 +290,11 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.qr_code_scanner, size: 16, color: Colors.white),
+                      Icon(
+                        Icons.qr_code_scanner,
+                        size: 16,
+                        color: Colors.white,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'OR SCAN MERCHANT QR CODE',
@@ -296,7 +322,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   if (vpa.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Please enter a valid UPI ID (e.g. store@upi)'),
+                        content: Text(
+                          'Please enter a valid UPI ID (e.g. store@upi)',
+                        ),
                         backgroundColor: AppColors.alertRed,
                       ),
                     );
@@ -305,7 +333,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
                   setState(() {
                     _vpaController.text = vpa;
-                    _nameController.text = tempNameController.text.trim().isNotEmpty
+                    _nameController.text =
+                        tempNameController.text.trim().isNotEmpty
                         ? tempNameController.text.trim()
                         : vpa.split('@').first.toUpperCase();
                     _recalculateOrder();
@@ -409,12 +438,17 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 // CRED NeoPOP Merchant Bar (Tap to Enter / Change UPI ID)
                 NeoPopCard(
                   color: isVpaSet ? AppColors.surface : const Color(0xFF14151B),
-                  borderColor: isVpaSet ? AppColors.neoBorder : AppColors.primaryGreen,
+                  borderColor: isVpaSet
+                      ? AppColors.neoBorder
+                      : AppColors.primaryGreen,
                   depth: 3,
                   child: InkWell(
                     onTap: _showUpiInputDialog,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
                           Container(
@@ -422,14 +456,20 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             decoration: BoxDecoration(
                               color: Colors.black,
                               border: Border.all(
-                                color: isVpaSet ? AppColors.primaryGreen : AppColors.goldenYellow,
+                                color: isVpaSet
+                                    ? AppColors.primaryGreen
+                                    : AppColors.goldenYellow,
                                 width: 1.0,
                               ),
                             ),
                             child: Icon(
-                              isVpaSet ? Icons.storefront_sharp : Icons.add_link_rounded,
+                              isVpaSet
+                                  ? Icons.storefront_sharp
+                                  : Icons.add_link_rounded,
                               size: 16,
-                              color: isVpaSet ? AppColors.primaryGreen : AppColors.goldenYellow,
+                              color: isVpaSet
+                                  ? AppColors.primaryGreen
+                                  : AppColors.goldenYellow,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -438,12 +478,16 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  isVpaSet ? 'PAYING TO UPI ID' : 'MERCHANT UPI ID (REQUIRED)',
+                                  isVpaSet
+                                      ? 'PAYING TO UPI ID'
+                                      : 'MERCHANT UPI ID (REQUIRED)',
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 1.2,
-                                    color: isVpaSet ? AppColors.textMuted : AppColors.primaryGreen,
+                                    color: isVpaSet
+                                        ? AppColors.textMuted
+                                        : AppColors.primaryGreen,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -454,7 +498,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w900,
-                                    color: isVpaSet ? Colors.white : AppColors.goldenYellow,
+                                    color: isVpaSet
+                                        ? Colors.white
+                                        : AppColors.goldenYellow,
                                     letterSpacing: 0.5,
                                   ),
                                   maxLines: 1,
@@ -464,7 +510,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black,
                               border: Border.all(color: AppColors.neoBorder),
@@ -548,7 +597,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   isDense: true,
                                   contentPadding: EdgeInsets.zero,
                                   hintText: '0',
-                                  hintStyle: TextStyle(color: Color(0xFF383B46)),
+                                  hintStyle: TextStyle(
+                                    color: Color(0xFF383B46),
+                                  ),
                                 ),
                                 onChanged: (_) {
                                   _selectedPresetTitle = 'CUSTOM BILL';
@@ -567,24 +618,32 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                           child: Row(
                             children: _kiranaPresets.map((preset) {
                               final isSelected =
-                                  _amountController.text == preset.amount.toStringAsFixed(0);
+                                  _amountController.text ==
+                                  preset.amount.toStringAsFixed(0);
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8),
                                 child: NeoPopButton(
-                                  color: isSelected ? Colors.white : AppColors.surfaceElevated,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppColors.surfaceElevated,
                                   border: Border.all(
-                                    color: isSelected ? Colors.white : AppColors.neoBorder,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : AppColors.neoBorder,
                                     width: 1.2,
                                   ),
                                   depth: 2,
                                   onTapUp: () {
-                                    _amountController.text = preset.amount.toStringAsFixed(0);
+                                    _amountController.text = preset.amount
+                                        .toStringAsFixed(0);
                                     _selectedPresetTitle = preset.title;
                                     _recalculateOrder();
                                   },
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
                                     child: Row(
                                       children: [
                                         Text(
@@ -593,7 +652,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                             fontSize: 10,
                                             fontWeight: FontWeight.w900,
                                             letterSpacing: 0.5,
-                                            color: isSelected ? Colors.black : Colors.white,
+                                            color: isSelected
+                                                ? Colors.black
+                                                : Colors.white,
                                           ),
                                         ),
                                         const SizedBox(width: 6),
@@ -602,8 +663,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w900,
-                                            color:
-                                                isSelected ? Colors.black : AppColors.primaryGreen,
+                                            color: isSelected
+                                                ? Colors.black
+                                                : AppColors.primaryGreen,
                                           ),
                                         ),
                                       ],
@@ -662,7 +724,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: Colors.black,
-                                  border: Border.all(color: const Color(0xFF2E303A)),
+                                  border: Border.all(
+                                    color: const Color(0xFF2E303A),
+                                  ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -694,7 +758,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: Colors.black,
-                                  border: Border.all(color: AppColors.primaryGreen, width: 1.0),
+                                  border: Border.all(
+                                    color: AppColors.primaryGreen,
+                                    width: 1.0,
+                                  ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -724,7 +791,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                         ),
                         const SizedBox(height: 10),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           color: const Color(0xFF16281D),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -759,7 +829,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 // Educational Disclaimer Pill
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF141418),
                       border: Border.all(color: const Color(0xFF26262E)),

@@ -29,6 +29,8 @@ class CloutShareModal extends StatelessWidget {
 
     final twitterUrl = 'https://twitter.com/intent/tweet?text=$tweetText';
 
+    final isDark = ThemeController.isDark(context);
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -37,12 +39,12 @@ class CloutShareModal extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 380),
         padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
-          color: const Color(0xFF141417),
+          color: AppColors.cardBg(context),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFF27272A), width: 1.0),
+          border: Border.all(color: AppColors.border(context), width: 1.0),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(160),
+              color: isDark ? Colors.black.withAlpha(160) : Colors.black.withAlpha(25),
               blurRadius: 30,
               offset: const Offset(0, 15),
             ),
@@ -60,26 +62,26 @@ class CloutShareModal extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF1B2E24),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.check_rounded, color: AppColors.primaryGreen, size: 14),
+                      child: const Icon(Icons.check_rounded, color: AppColors.primaryBlue, size: 14),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       'Zero-MDR Receipt',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.text(context),
                       ),
                     ),
                   ],
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                  icon: Icon(Icons.close_rounded, color: AppColors.textSub(context), size: 20),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -92,9 +94,9 @@ class CloutShareModal extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1E),
+                color: isDark ? const Color(0xFF1A1A1E) : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF2E2E34)),
+                border: Border.all(color: AppColors.border(context)),
               ),
               child: Column(
                 children: [
@@ -108,10 +110,10 @@ class CloutShareModal extends StatelessWidget {
                           children: [
                             Text(
                               order.merchantName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color: AppColors.text(context),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -128,7 +130,7 @@ class CloutShareModal extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1B2E24),
+                          color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
@@ -136,7 +138,7 @@ class CloutShareModal extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.primaryGreen,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                       ),
@@ -144,20 +146,20 @@ class CloutShareModal extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 14),
-                  const Divider(color: Color(0xFF28282E), height: 1),
+                  Divider(color: AppColors.border(context), height: 1),
                   const SizedBox(height: 14),
 
                   // Amount Settled
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Total Settled',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 12, color: AppColors.textSub(context), fontWeight: FontWeight.w500),
                       ),
                       Text(
                         '₹${order.totalAmount.toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.text(context)),
                       ),
                     ],
                   ),
@@ -168,26 +170,26 @@ class CloutShareModal extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.blueSurface,
+                      color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.primaryGreen.withAlpha(60)),
+                      border: Border.all(color: AppColors.primaryBlue.withAlpha(60)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Row(
                           children: [
-                            Icon(Icons.bolt, color: AppColors.primaryGreen, size: 16),
+                            Icon(Icons.bolt, color: AppColors.primaryBlue, size: 16),
                             SizedBox(width: 6),
                             Text(
                               'MDR Surcharge Saved',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
                             ),
                           ],
                         ),
                         Text(
                           '+₹${order.mdrSavings.toStringAsFixed(2)}',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.primaryBlue),
                         ),
                       ],
                     ),
@@ -198,13 +200,13 @@ class CloutShareModal extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${order.tranches.length} sub-₹2,000 tranches',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                      const Text(
+                        '0% MDR Tranching Engine',
+                        style: TextStyle(fontSize: 11, color: AppColors.textMuted),
                       ),
                       const Text(
                         '0% MDR Certified',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
                       ),
                     ],
                   ),
@@ -224,16 +226,16 @@ class CloutShareModal extends StatelessWidget {
                       onPressed: () {
                         launchUrl(Uri.parse(twitterUrl), mode: LaunchMode.externalApplication);
                       },
-                      icon: const Icon(Icons.send_rounded, size: 14, color: Colors.black),
-                      label: const Text(
+                      icon: Icon(Icons.send_rounded, size: 14, color: isDark ? Colors.black : Colors.white),
+                      label: Text(
                         'Post on X',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: isDark ? Colors.black : Colors.white),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
+                        backgroundColor: isDark ? Colors.white : const Color(0xFF1E293B),
+                        foregroundColor: isDark ? Colors.black : Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -251,16 +253,16 @@ class CloutShareModal extends StatelessWidget {
                             'Check out SplitPe!';
                         SharePlus.instance.share(ShareParams(text: msg));
                       },
-                      icon: const Icon(Icons.share_rounded, size: 14, color: Colors.black),
+                      icon: const Icon(Icons.share_rounded, size: 14, color: Colors.white),
                       label: const Text(
                         'WhatsApp',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black),
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
-                        foregroundColor: Colors.black,
+                        backgroundColor: AppColors.primaryBlue,
+                        foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),

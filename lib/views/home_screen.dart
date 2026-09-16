@@ -151,6 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showAboutMdrDialog(BuildContext context) {
+    final isDark = ThemeController.isDark(context);
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
@@ -158,54 +159,68 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: const Color(0xFF141417),
+            color: AppColors.cardBg(context),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFF27272A)),
+            border: Border.all(color: AppColors.border(context)),
+            boxShadow: [
+              BoxShadow(
+                color: isDark ? Colors.black.withAlpha(150) : Colors.black.withAlpha(25),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.shield_rounded, color: AppColors.primaryGreen, size: 20),
-                  SizedBox(width: 8),
+                  const Icon(Icons.shield_rounded, color: AppColors.primaryBlue, size: 20),
+                  const SizedBox(width: 8),
                   Text(
                     'The 0% MDR Arbitrage',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
-                      color: Colors.white,
+                      color: AppColors.text(context),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 14),
-              const Text(
+              Text(
                 '• NPCI guidelines mandate interchange fees on merchant transactions exceeding ₹2,000.\n'
                 '• Transactions of ₹2,000 or under remain 0% MDR compliant.\n'
                 '• SplitPe demonstrates algorithmic bill tranching to simulate surcharge-free transactions.',
-                style: TextStyle(fontSize: 12, height: 1.5, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 12,
+                  height: 1.5,
+                  color: AppColors.textSub(context),
+                ),
               ),
               const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1A14),
-                  border: Border.all(color: const Color(0xFF5A4418)),
+                  color: isDark ? const Color(0xFF1E1A14) : const Color(0xFFFEF3C7),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF5A4418) : const Color(0xFFF59E0B),
+                  ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('⚖️', style: TextStyle(fontSize: 14)),
-                    SizedBox(width: 8),
+                    const Text('⚖️', style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'DISCLAIMER: This application is designed strictly for educational, academic demonstration, and algorithmic simulation purposes.',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFFFBBF24),
+                          color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309),
                           height: 1.3,
                         ),
                       ),
@@ -220,10 +235,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(ctx),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppColors.primaryBlue,
+                    foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: const RoundedRectangleBorder(),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: const Text(
                     'I UNDERSTAND',

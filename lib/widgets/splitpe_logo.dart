@@ -85,7 +85,7 @@ class SplitPeLogo extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.blueSurface,
+                color: AppColors.chipBg(context),
                 border: Border.all(color: AppColors.primaryBlue, width: 1.0),
               ),
               child: const Text(
@@ -94,7 +94,7 @@ class SplitPeLogo extends StatelessWidget {
                   fontSize: 9,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
-                  color: AppColors.primaryGreen,
+                  color: AppColors.primaryBlue,
                 ),
               ),
             ),

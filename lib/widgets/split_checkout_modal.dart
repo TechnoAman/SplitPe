@@ -88,6 +88,8 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
         ? order.tranches[_activeStepIndex]
         : order.tranches.last;
 
+    final isDark = ThemeController.isDark(context);
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -100,12 +102,12 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
             constraints: const BoxConstraints(maxWidth: 380),
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: const Color(0xFF141417),
+              color: AppColors.cardBg(context),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFF27272A), width: 1.2),
+              border: Border.all(color: AppColors.border(context), width: 1.2),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(160),
+                  color: isDark ? Colors.black.withAlpha(160) : Colors.black.withAlpha(30),
                   blurRadius: 30,
                   offset: const Offset(0, 15),
                 ),
@@ -127,15 +129,15 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF222228),
+                              color: AppColors.chipBg(context),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               isDone ? 'COMPLETED' : 'TRANCHE ${_activeStepIndex + 1} OF $totalSteps',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textSecondary,
+                                color: AppColors.textSub(context),
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -144,7 +146,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                        icon: Icon(Icons.close_rounded, color: AppColors.textSub(context), size: 20),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
@@ -172,10 +174,10 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                               margin: EdgeInsets.only(right: index == totalSteps - 1 ? 0 : 5),
                               decoration: BoxDecoration(
                                 color: isPaid
-                                    ? AppColors.primaryGreen
+                                    ? AppColors.primaryBlue
                                     : isCurrent
-                                        ? Colors.white
-                                        : const Color(0xFF2E2E34),
+                                        ? (isDark ? Colors.white : AppColors.primaryBlue)
+                                        : (isDark ? const Color(0xFF2E2E34) : const Color(0xFFE2E8F0)),
                                 borderRadius: BorderRadius.circular(2),
                               ),
                             ),
@@ -189,10 +191,10 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                     // 2. Payee Name & VPA
                     Text(
                       order.merchantName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.text(context),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -218,7 +220,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withAlpha(80),
+                            color: Colors.black.withAlpha(isDark ? 80 : 25),
                             blurRadius: 16,
                             offset: const Offset(0, 6),
                           ),
@@ -242,20 +244,20 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                     // 4. Hero Amount
                     Text(
                       '₹${currentTranche.amount.toStringAsFixed(2)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: AppColors.text(context),
                         letterSpacing: -1.0,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      'Total Bill: ₹${order.totalAmount.toStringAsFixed(0)} · 0% MDR',
-                      style: const TextStyle(
+                    const Text(
+                      'Total Bill: 0% MDR Qualified',
+                      style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryGreen,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryBlue,
                       ),
                     ),
 
@@ -273,18 +275,18 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                               await UpiService.copyToClipboard(currentTranche.upiUri);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('⚡ Copied UPI Link to Clipboard!'),
-                                    backgroundColor: Color(0xFF1E1E22),
-                                    duration: Duration(seconds: 2),
+                                  SnackBar(
+                                    content: const Text('⚡ Copied UPI Link to Clipboard!'),
+                                    backgroundColor: isDark ? const Color(0xFF1E1E22) : Colors.black87,
+                                    duration: const Duration(seconds: 2),
                                   ),
                                 );
                               }
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
+                            backgroundColor: AppColors.primaryBlue,
+                            foregroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -302,10 +304,10 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: _markCurrentAsPaid,
-                        child: const Text(
+                        child: Text(
                           'Mark as Paid (Demo)',
                           style: TextStyle(
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSub(context),
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -316,19 +318,19 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: AppColors.blueSurface,
+                          color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.primaryGreen.withAlpha(80)),
+                          border: Border.all(color: AppColors.primaryBlue.withAlpha(80)),
                         ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.check_circle_rounded, color: AppColors.primaryGreen, size: 16),
+                            Icon(Icons.check_circle_rounded, color: AppColors.primaryBlue, size: 16),
                             SizedBox(width: 6),
                             Text(
                               'Tranche Paid',
                               style: TextStyle(
-                                color: AppColors.primaryGreen,
+                                color: AppColors.primaryBlue,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -347,7 +349,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                           child: const Text(
                             'Next Tranche →',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.primaryBlue,
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -366,7 +368,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                           height: 68,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.primaryGreen, width: 2),
+                            border: Border.all(color: AppColors.primaryBlue, width: 2),
                             image: const DecorationImage(
                               image: AssetImage('assets/images/gandhi_currency.png'),
                               fit: BoxFit.cover,
@@ -376,29 +378,29 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: const BoxDecoration(
-                            color: AppColors.primaryGreen,
+                            color: AppColors.primaryBlue,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.check_rounded, color: Colors.black, size: 14),
+                          child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
-                    const Text(
+                    Text(
                       'Bill Fully Settled',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: AppColors.text(context),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '₹${order.totalAmount.toStringAsFixed(0)} settled across $totalSteps tranches with zero MDR fee.\nYou retained all your hard-earned Gandhis 💸',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSub(context),
                         height: 1.4,
                       ),
                     ),
@@ -412,8 +414,8 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                           CloutShareModal.show(context, order);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGreen,
-                          foregroundColor: Colors.black,
+                          backgroundColor: AppColors.primaryBlue,
+                          foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -428,9 +430,9 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text(
+                      child: Text(
                         'Done',
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: AppColors.textSub(context), fontSize: 13, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],

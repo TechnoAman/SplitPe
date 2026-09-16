@@ -101,6 +101,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
       text: _nameController.text,
     );
 
+    final isDark = ThemeController.isDark(context);
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -113,11 +115,19 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
             20,
             MediaQuery.of(context).viewInsets.bottom + 24,
           ),
-          decoration: const BoxDecoration(
-            color: Color(0xFF0F1014),
-            border: Border(
-              top: BorderSide(color: AppColors.primaryGreen, width: 2.0),
+          decoration: BoxDecoration(
+            color: AppColors.cardBg(context),
+            border: const Border(
+              top: BorderSide(color: AppColors.primaryBlue, width: 2.0),
             ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: isDark ? Colors.black.withAlpha(180) : Colors.black.withAlpha(30),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -126,20 +136,20 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'ENTER MERCHANT UPI ID',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.2,
-                      color: Colors.white,
+                      color: AppColors.text(context),
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(ctx),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSub(context),
                       size: 20,
                     ),
                     padding: EdgeInsets.zero,
@@ -166,21 +176,22 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black,
-                  border: Border.all(color: AppColors.neoBorder, width: 1.2),
+                  color: isDark ? Colors.black : const Color(0xFFF1F5F9),
+                  border: Border.all(color: AppColors.border(context), width: 1.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: TextField(
                   controller: tempVpaController,
                   autofocus: true,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.text(context),
                   ),
                   decoration: const InputDecoration(
                     hintText: 'e.g. guptakirana@okhdfcbank',
                     hintStyle: TextStyle(
-                      color: Color(0xFF4A4E5C),
+                      color: AppColors.textMuted,
                       fontSize: 13,
                     ),
                     border: InputBorder.none,
@@ -215,15 +226,16 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1B1C22),
-                            border: Border.all(color: const Color(0xFF2E303A)),
+                            color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                            border: Border.all(color: AppColors.primaryBlue.withAlpha(100)),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             handle,
                             style: const TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.primaryGreen,
+                              color: AppColors.primaryBlue,
                             ),
                           ),
                         ),
@@ -252,20 +264,21 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black,
-                  border: Border.all(color: AppColors.neoBorder, width: 1.2),
+                  color: isDark ? Colors.black : const Color(0xFFF1F5F9),
+                  border: Border.all(color: AppColors.border(context), width: 1.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: TextField(
                   controller: tempNameController,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppColors.text(context),
                   ),
                   decoration: const InputDecoration(
                     hintText: 'e.g. Gupta Kirana Store',
                     hintStyle: TextStyle(
-                      color: Color(0xFF4A4E5C),
+                      color: AppColors.textMuted,
                       fontSize: 13,
                     ),
                     border: InputBorder.none,
@@ -284,25 +297,26 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF14151B),
-                    border: Border.all(color: const Color(0xFF2E303A)),
+                    color: isDark ? const Color(0xFF14151B) : const Color(0xFFF1F5F9),
+                    border: Border.all(color: AppColors.border(context)),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.qr_code_scanner,
                         size: 16,
-                        color: Colors.white,
+                        color: AppColors.text(context),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'OR SCAN MERCHANT QR CODE',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.8,
-                          color: Colors.white,
+                          color: AppColors.text(context),
                         ),
                       ),
                     ],
@@ -314,7 +328,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
               // Confirm Button
               NeoPopButton(
-                color: AppColors.primaryGreen,
+                color: AppColors.primaryBlue,
                 border: Border.all(color: Colors.black, width: 1.5),
                 depth: 3.0,
                 onTapUp: () {
@@ -351,7 +365,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.8,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -555,14 +569,25 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   depth: 4,
                   child: Stack(
                     children: [
-                      // Subdued Banknote Security Watermark
+                      // Subdued Banknote Security Watermark with Seamless Radial Fade Mask
                       Positioned(
                         right: -10,
                         top: -10,
                         bottom: -10,
                         child: IgnorePointer(
-                          child: Opacity(
-                            opacity: isDark ? 0.09 : 0.05,
+                          child: ShaderMask(
+                            shaderCallback: (rect) {
+                              return RadialGradient(
+                                center: Alignment.center,
+                                radius: 0.65,
+                                colors: [
+                                  Colors.white.withOpacity(isDark ? 0.14 : 0.08),
+                                  Colors.transparent,
+                                ],
+                                stops: const [0.3, 1.0],
+                              ).createShader(rect);
+                            },
+                            blendMode: BlendMode.dstIn,
                             child: Image.asset(
                               'assets/images/gandhi_currency.png',
                               fit: BoxFit.contain,
@@ -850,12 +875,13 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                           child: Row(
                             children: [
                               Container(
-                                width: 28,
-                                height: 28,
+                                width: 30,
+                                height: 30,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4),
+                                  shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: AppColors.primaryBlue.withAlpha(120),
+                                    color: AppColors.primaryBlue.withAlpha(160),
+                                    width: 1.5,
                                   ),
                                   image: const DecorationImage(
                                     image: AssetImage(

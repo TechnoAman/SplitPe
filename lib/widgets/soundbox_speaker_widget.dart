@@ -36,17 +36,30 @@ class _SoundboxSpeakerWidgetState extends State<SoundboxSpeakerWidget>
 
   @override
   Widget build(BuildContext context) {
-    final hasAnnouncement = widget.announcementText != null && widget.announcementText!.isNotEmpty;
+    final hasAnnouncement =
+        widget.announcementText != null && widget.announcementText!.isNotEmpty;
+    final isDark = ThemeController.isDark(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF141417),
+        color: isDark ? const Color(0xFF141417) : AppColors.cardBg(context),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: hasAnnouncement ? AppColors.primaryGreen.withAlpha(60) : const Color(0xFF27272A),
+          color: hasAnnouncement
+              ? AppColors.primaryBlue.withAlpha(120)
+              : AppColors.border(context),
           width: 1.0,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withAlpha(80)
+                : Colors.black.withAlpha(15),
+            offset: const Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -54,12 +67,22 @@ class _SoundboxSpeakerWidgetState extends State<SoundboxSpeakerWidget>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: hasAnnouncement ? const Color(0xFF1E2B22) : const Color(0xFF1E1E24),
+              color: hasAnnouncement
+                  ? (isDark
+                      ? AppColors.blueSurface
+                      : const Color(0xFFE8F0FE))
+                  : (isDark
+                      ? const Color(0xFF1E1E24)
+                      : const Color(0xFFF1F5F9)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              hasAnnouncement ? Icons.volume_up_rounded : Icons.speaker_outlined,
-              color: hasAnnouncement ? AppColors.primaryGreen : AppColors.textSecondary,
+              hasAnnouncement
+                  ? Icons.volume_up_rounded
+                  : Icons.speaker_outlined,
+              color: hasAnnouncement
+                  ? AppColors.primaryBlue
+                  : AppColors.textSub(context),
               size: 18,
             ),
           ),
@@ -73,21 +96,26 @@ class _SoundboxSpeakerWidgetState extends State<SoundboxSpeakerWidget>
               children: [
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'DIGITAL SOUNDBOX',
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.8,
-                        color: AppColors.textMuted,
+                        color: isDark
+                            ? AppColors.textMuted
+                            : AppColors.lightTextMuted,
                       ),
                     ),
                     const SizedBox(width: 6),
                     if (hasAnnouncement)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryGreen.withAlpha(30),
+                          color: AppColors.primaryBlue.withAlpha(30),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
@@ -95,7 +123,7 @@ class _SoundboxSpeakerWidgetState extends State<SoundboxSpeakerWidget>
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.primaryGreen,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                       ),
@@ -108,8 +136,10 @@ class _SoundboxSpeakerWidgetState extends State<SoundboxSpeakerWidget>
                       : 'Audio confirmation will broadcast here upon tranche clearance.',
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: hasAnnouncement ? Colors.white : AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                    color: hasAnnouncement
+                        ? AppColors.text(context)
+                        : AppColors.textSub(context),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -144,7 +174,7 @@ class _SoundboxSpeakerWidgetState extends State<SoundboxSpeakerWidget>
       width: 2.5,
       height: height.clamp(4.0, 20.0),
       decoration: BoxDecoration(
-        color: AppColors.primaryGreen,
+        color: AppColors.primaryBlue,
         borderRadius: BorderRadius.circular(1),
       ),
     );

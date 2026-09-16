@@ -442,8 +442,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   color: isVpaSet
                       ? AppColors.cardBg(context)
                       : (isDark
-                          ? const Color(0xFF14151B)
-                          : AppColors.lightSurfaceElevated),
+                            ? const Color(0xFF14151B)
+                            : AppColors.lightSurfaceElevated),
                   borderColor: isVpaSet
                       ? AppColors.border(context)
                       : AppColors.primaryBlue,
@@ -656,14 +656,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                     child: NeoPopButton(
                                       color: isSelected
                                           ? (isDark
-                                              ? Colors.white
-                                              : AppColors.primaryBlue)
+                                                ? Colors.white
+                                                : AppColors.primaryBlue)
                                           : AppColors.cardElevated(context),
                                       border: Border.all(
                                         color: isSelected
                                             ? (isDark
-                                                ? Colors.white
-                                                : AppColors.primaryBlue)
+                                                  ? Colors.white
+                                                  : AppColors.primaryBlue)
                                             : AppColors.border(context),
                                         width: 1.2,
                                       ),
@@ -689,8 +689,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                                 letterSpacing: 0.5,
                                                 color: isSelected
                                                     ? (isDark
-                                                        ? Colors.black
-                                                        : Colors.white)
+                                                          ? Colors.black
+                                                          : Colors.white)
                                                     : AppColors.text(context),
                                               ),
                                             ),
@@ -702,8 +702,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                                 fontWeight: FontWeight.w900,
                                                 color: isSelected
                                                     ? (isDark
-                                                        ? Colors.black
-                                                        : Colors.white)
+                                                          ? Colors.black
+                                                          : Colors.white)
                                                     : AppColors.primaryBlue,
                                               ),
                                             ),
@@ -855,9 +855,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                    color: AppColors.primaryBlue.withAlpha(
-                                      120,
-                                    ),
+                                    color: AppColors.primaryBlue.withAlpha(120),
                                   ),
                                   image: const DecorationImage(
                                     image: AssetImage(
@@ -927,9 +925,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: isDark
-                                        ? Colors.black
-                                        : Colors.white,
+                                    color: isDark ? Colors.black : Colors.white,
                                     border: Border.all(
                                       color: AppColors.primaryBlue,
                                     ),
@@ -1040,10 +1036,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
           decoration: BoxDecoration(
             color: AppColors.bg(context),
             border: Border(
-              top: BorderSide(
-                color: AppColors.border(context),
-                width: 1.0,
-              ),
+              top: BorderSide(color: AppColors.border(context), width: 1.0),
             ),
           ),
           child: NeoPopTiltedButton(

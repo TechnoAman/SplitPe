@@ -819,6 +819,84 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             ],
                           ),
                         ),
+                        if (order != null && order.tranches.length > 1) ...[
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'DYNAMIC ZERO-MDR TRANCHES',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.0,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              InkWell(
+                                onTap: _recalculateOrder,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    border: Border.all(
+                                      color: AppColors.primaryGreen,
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        '🎲',
+                                        style: TextStyle(fontSize: 10),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'RE-ROLL',
+                                        style: TextStyle(
+                                          fontSize: 8.5,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppColors.primaryGreen,
+                                          letterSpacing: 0.8,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: order.tranches.map((t) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF14151B),
+                                  border: Border.all(
+                                    color: const Color(0xFF26262E),
+                                  ),
+                                ),
+                                child: Text(
+                                  '#${t.index}: ₹${t.amount.toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ],
                     ),
                   ),

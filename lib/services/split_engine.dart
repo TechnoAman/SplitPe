@@ -6,6 +6,91 @@ class SplitEngine {
   /// Default safe threshold per tranche (below ₹2,000 to be 100% exempt from MDR)
   static const double safeTrancheCap = 1999.0;
 
+  /// Calculates randomized or fixed tranche amounts that sum exactly to [totalAmount]
+  /// with each tranche <= [maxTranche].
+  static List<double> calculateTrancheAmounts({
+    required double totalAmount,
+    double maxTranche = safeTrancheCap,
+    bool randomize = true,
+  }) {
+    if (totalAmount <= 0) return [];
+    if (totalAmount <= maxTranche) return [totalAmount];
+
+    final int trancheCount = (totalAmount / maxTranche).ceil();
+    final List<double> amounts = [];
+    final random = Random();
+    double remaining = totalAmount;
+
+    if (!randomize || trancheCount <= 1) {
+      for (int i = 0; i < trancheCount; i++) {
+        if (i == trancheCount - 1) {
+          amounts.add(double.parse(remaining.toStringAsFixed(2)));
+        } else {
+          final amt = min(maxTranche, remaining);
+          amounts.add(double.parse(amt.toStringAsFixed(2)));
+          remaining -= amt;
+        }
+      }
+      return amounts;
+    }
+
+    // Natural randomized distribution
+    for (int i = 0; i < trancheCount - 1; i++) {
+      final remainingCount = trancheCount - 1 - i;
+      // To ensure remaining tranches can fulfill the rest without exceeding maxTranche:
+      final minAllowed = max(10.0, remaining - (remainingCount * maxTranche));
+      // To ensure remaining tranches have at least min (e.g. ₹10) each:
+      final maxAllowed = min(maxTranche, remaining - (remainingCount * 10.0));
+
+      double picked;
+      if (maxAllowed <= minAllowed) {
+        picked = minAllowed;
+      } else {
+        final isWhole = (totalAmount % 1 == 0);
+        final spread = maxAllowed - minAllowed;
+
+        if (isWhole && spread >= 10) {
+          final minInt = minAllowed.ceil();
+          final maxInt = maxAllowed.floor();
+          if (maxInt > minInt) {
+            // Pick a random whole rupee
+            picked = (minInt + random.nextInt(maxInt - minInt + 1)).toDouble();
+          } else {
+            picked = minInt.toDouble();
+          }
+        } else {
+          picked = minAllowed + random.nextDouble() * (maxAllowed - minAllowed);
+          picked = (picked * 100).round() / 100.0;
+        }
+      }
+
+      amounts.add(double.parse(picked.toStringAsFixed(2)));
+      remaining -= picked;
+      remaining = double.parse(remaining.toStringAsFixed(2));
+    }
+
+    // Last tranche gets the exact remaining amount
+    amounts.add(double.parse(remaining.toStringAsFixed(2)));
+
+    // Fallback sanity check: if any tranche violated bounds, use balanced split
+    if (amounts.any((a) => a > maxTranche || a <= 0)) {
+      amounts.clear();
+      remaining = totalAmount;
+      final base = (totalAmount / trancheCount);
+      for (int i = 0; i < trancheCount; i++) {
+        if (i == trancheCount - 1) {
+          amounts.add(double.parse(remaining.toStringAsFixed(2)));
+        } else {
+          final amt = double.parse(base.toStringAsFixed(2));
+          amounts.add(amt);
+          remaining -= amt;
+        }
+      }
+    }
+
+    return amounts;
+  }
+
   /// Creates a SplitOrder by dividing [totalAmount] into sub-₹2,000 tranches.
   static SplitOrder createTrancheOrder({
     required double totalAmount,
@@ -13,6 +98,7 @@ class SplitEngine {
     required String merchantName,
     String note = 'SplitPe Checkout',
     double maxTranche = safeTrancheCap,
+    bool randomize = true,
   }) {
     final orderId =
         'ORD${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}';
@@ -30,59 +116,32 @@ class SplitEngine {
       );
     }
 
-    if (totalAmount <= 2000.0) {
-      // Single tranche is already zero MDR
-      final trancheId = '${orderId}_1';
+    final amounts = calculateTrancheAmounts(
+      totalAmount: totalAmount,
+      maxTranche: maxTranche,
+      randomize: randomize,
+    );
+
+    final trancheCount = amounts.length;
+    for (int i = 0; i < trancheCount; i++) {
+      final trancheAmt = amounts[i];
+      final index = i + 1;
+      final trancheId = '${orderId}_$index';
       final upiUri = buildUpiUri(
         vpa: merchantVpa,
         name: merchantName,
-        amount: totalAmount,
-        note: '$note Tranche 1/1',
+        amount: trancheAmt,
+        note: trancheCount == 1 ? note : '$note Tranche $index/$trancheCount',
       );
+
       tranches.add(
-        Tranche(id: trancheId, index: 1, amount: totalAmount, upiUri: upiUri),
+        Tranche(
+          id: trancheId,
+          index: index,
+          amount: trancheAmt,
+          upiUri: upiUri,
+        ),
       );
-    } else {
-      // Split into chunks of maxTranche (or evenly distributed)
-      double remaining = totalAmount;
-      int index = 1;
-
-      // Calculate number of tranches needed
-      int trancheCount = (totalAmount / maxTranche).ceil();
-
-      // Distribute evenly or standard chunking
-      for (int i = 0; i < trancheCount; i++) {
-        double trancheAmt;
-        if (i == trancheCount - 1) {
-          trancheAmt = double.parse(remaining.toStringAsFixed(2));
-        } else {
-          // If remaining is large, take maxTranche
-          trancheAmt = min(maxTranche, remaining);
-          trancheAmt = double.parse(trancheAmt.toStringAsFixed(2));
-        }
-
-        if (trancheAmt > 0) {
-          final trancheId = '${orderId}_$index';
-          final upiUri = buildUpiUri(
-            vpa: merchantVpa,
-            name: merchantName,
-            amount: trancheAmt,
-            note: '$note Tranche $index/$trancheCount',
-          );
-
-          tranches.add(
-            Tranche(
-              id: trancheId,
-              index: index,
-              amount: trancheAmt,
-              upiUri: upiUri,
-            ),
-          );
-
-          remaining -= trancheAmt;
-          index++;
-        }
-      }
     }
 
     return SplitOrder(

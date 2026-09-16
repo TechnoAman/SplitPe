@@ -208,7 +208,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
 
           // Quick Share WhatsApp Button
           NeoPopActionButton(
-            text: 'SHARE SPLIT LINKS ON WHATSAPP 💬',
+            text: 'SHARE SPLIT LINKS ON WHATSAPP 📲',
             color: AppColors.neonCyan,
             textColor: Colors.black,
             prefixIcon: const Icon(Icons.share_rounded, color: Colors.black, size: 16),

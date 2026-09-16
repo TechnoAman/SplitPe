@@ -34,22 +34,24 @@ class NeoPopActionButton extends StatelessWidget {
       border: Border.all(color: Colors.black, width: 1.5),
       child: Container(
         width: isFullWidth ? double.infinity : null,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (prefixIcon != null) ...[
-              prefixIcon!,
-              const SizedBox(width: 8),
-            ],
-            Text(
-              text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.8,
+            if (prefixIcon != null) ...[prefixIcon!, const SizedBox(width: 8)],
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.6,
+                  ),
+                ),
               ),
             ),
           ],
@@ -101,10 +103,7 @@ class NeoPopSurfaceCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return InkWell(
-        onTap: onTap,
-        child: content,
-      );
+      return InkWell(onTap: onTap, child: content);
     }
     return content;
   }
@@ -133,20 +132,13 @@ class NeoPopPillBadge extends StatelessWidget {
         color: color,
         border: Border.all(color: Colors.black, width: 1.2),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black,
-            offset: Offset(2, 2),
-            blurRadius: 0,
-          ),
+          BoxShadow(color: Colors.black, offset: Offset(2, 2), blurRadius: 0),
         ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[
-            icon!,
-            const SizedBox(width: 4),
-          ],
+          if (icon != null) ...[icon!, const SizedBox(width: 4)],
           Text(
             label,
             style: TextStyle(

@@ -247,13 +247,18 @@ class QrTrancheCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(Icons.rocket_launch_rounded, color: Colors.black, size: 14),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Pay Tranche #${tranche.index}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.black,
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Pay #${tranche.index}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -281,12 +286,17 @@ class QrTrancheCard extends StatelessWidget {
                         children: [
                           Icon(Icons.check_circle_outline, color: AppColors.textSecondary, size: 14),
                           SizedBox(width: 4),
-                          Text(
-                            'Simulate',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textSecondary,
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Simulate',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
                             ),
                           ),
                         ],

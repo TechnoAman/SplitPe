@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:confetti/confetti.dart';
 import 'package:neopop/neopop.dart';
 import '../models/split_order.dart';
-import '../models/tranche.dart';
 import '../services/split_engine.dart';
 import '../theme/app_theme.dart';
-import '../widgets/clout_share_modal.dart';
 import '../widgets/neopop_components.dart';
-import '../widgets/qr_tranche_card.dart';
 import '../widgets/soundbox_speaker_widget.dart';
+import '../widgets/split_checkout_modal.dart';
 import 'qr_scanner_view.dart';
 
 class PosCheckoutView extends StatefulWidget {
@@ -24,7 +21,6 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   final _vpaController = TextEditingController(text: '');
   final _nameController = TextEditingController(text: '');
 
-  late ConfettiController _confettiController;
   SplitOrder? _currentOrder;
   String? _soundboxAnnouncement;
 
@@ -33,11 +29,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     if (widget.initialScannedData != null) {
       applyScannedData(widget.initialScannedData!);
     } else {
-      _generateSplitOrder();
+      _recalculateOrder();
     }
   }
 
@@ -46,7 +41,6 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     _amountController.dispose();
     _vpaController.dispose();
     _nameController.dispose();
-    _confettiController.dispose();
     super.dispose();
   }
 
@@ -61,19 +55,22 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
       if (am.isNotEmpty && double.tryParse(am) != null && double.parse(am) > 0) {
         _amountController.text = double.parse(am).toStringAsFixed(0);
       }
-      _generateSplitOrder();
+      _recalculateOrder();
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '⚡ Scanned Payee: ${_nameController.text.isNotEmpty ? _nameController.text : _vpaController.text}',
+          '⚡ Loaded Payee: ${_nameController.text.isNotEmpty ? _nameController.text : _vpaController.text}',
           style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.black),
         ),
         backgroundColor: AppColors.primaryGreen,
         duration: const Duration(seconds: 2),
       ),
     );
+
+    // Auto-open checkout modal on scan
+    _openCheckoutModal();
   }
 
   Future<void> scanMerchantQr() async {
@@ -87,7 +84,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     }
   }
 
-  void _generateSplitOrder() {
+  void _recalculateOrder() {
     final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
     if (amt <= 0) return;
 
@@ -105,509 +102,305 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
         merchantName: name,
         note: 'Bill Payment',
       );
-      _soundboxAnnouncement =
-          'Split into ${_currentOrder!.tranches.length} tranches. Zero MDR active!';
     });
   }
 
-  void _simulatePayTranche(Tranche tranche) {
-    if (_currentOrder == null || tranche.isPaid) return;
-
-    setState(() {
-      tranche.status = TrancheStatus.paid;
-      tranche.paidAt = DateTime.now();
-      tranche.txnRef = 'TXN${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-
-      final saved = (tranche.amount * 0.004).toStringAsFixed(2);
-      _soundboxAnnouncement =
-          '🔊 ₹${tranche.amount.toStringAsFixed(0)} received on SplitPe! Zero MDR charged (Saved ₹$saved)';
-
-      if (_currentOrder!.isFullyPaid) {
-        _confettiController.play();
-        _soundboxAnnouncement =
-            '🎉 Full Bill of ₹${_currentOrder!.totalAmount.toStringAsFixed(0)} settled with ₹0 MDR! (Total Saved: ₹${_currentOrder!.mdrSavings.toStringAsFixed(2)})';
-      }
-    });
-  }
-
-  void _simulatePayAll() {
+  void _openCheckoutModal() {
+    _recalculateOrder();
     if (_currentOrder == null) return;
-    setState(() {
-      for (var t in _currentOrder!.tranches) {
-        t.status = TrancheStatus.paid;
-        t.paidAt = DateTime.now();
-        t.txnRef = 'TXN${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-      }
-      _confettiController.play();
-      _soundboxAnnouncement =
-          '🎉 100% Bill Settled! Saved ₹${_currentOrder!.mdrSavings.toStringAsFixed(2)} MDR on SplitPe!';
-    });
-  }
 
-  void _resetOrder() {
-    setState(() {
-      _generateSplitOrder();
-    });
+    SplitCheckoutModal.show(
+      context,
+      order: _currentOrder!,
+      onOrderUpdated: (updatedOrder) {
+        setState(() {
+          _currentOrder = updatedOrder;
+          if (updatedOrder.isFullyPaid) {
+            _soundboxAnnouncement =
+                '🎉 Bill of ₹${updatedOrder.totalAmount.toStringAsFixed(0)} 100% settled with ₹0 MDR fee!';
+          }
+        });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final order = _currentOrder;
+    final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
+    final trancheCount = (amt / 1999.0).ceil();
+    final potentialSavings = (amt * 0.004).toStringAsFixed(2);
 
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Soundbox announcement bar
-              SoundboxSpeakerWidget(
-                announcementText: _soundboxAnnouncement,
-                isPlaying: order?.isFullyPaid ?? false,
-              ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Soundbox Live Broadcast Bar
+          SoundboxSpeakerWidget(
+            announcementText: _soundboxAnnouncement,
+            isPlaying: order?.isFullyPaid ?? false,
+          ),
 
-              const SizedBox(height: 14),
+          const SizedBox(height: 14),
 
-              // CRED NeoPOP Input Amount & Config Card
-              _buildInputCard(),
-
-              const SizedBox(height: 14),
-
-              if (order != null) ...[
-                // CRED NeoPOP MDR Savings Summary Banner
-                _buildSavingsBanner(order),
-
-                const SizedBox(height: 14),
-
-                // Order Progress Indicator
-                _buildProgressCard(order),
-
-                const SizedBox(height: 16),
-
-                // Section Title & Batch Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'ACTIVE TRANCHES (${order.tranches.length})',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.2,
-                        color: AppColors.textSecondary,
+          // Main Setup Card (Payee + Amount)
+          NeoPopSurfaceCard(
+            backgroundColor: const Color(0xFF101012),
+            borderColor: AppColors.neoBorder,
+            depth: 4.0,
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Payee Selector Banner
+                InkWell(
+                  onTap: scanMerchantQr,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: _vpaController.text.isNotEmpty
+                          ? const Color(0xFF16251C)
+                          : const Color(0xFF18181B),
+                      border: Border.all(
+                        color: _vpaController.text.isNotEmpty
+                            ? AppColors.primaryGreen
+                            : AppColors.cardBorder,
+                        width: 1.5,
                       ),
                     ),
-                    if (!order.isFullyPaid)
-                      NeoPopButton(
-                        color: AppColors.surfaceElevated,
-                        bottomShadowColor: Colors.black,
-                        rightShadowColor: Colors.black,
-                        depth: 2.0,
-                        border: Border.all(color: AppColors.primaryGreen, width: 1.2),
-                        onTapUp: _simulatePayAll,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.flash_on_rounded, size: 13, color: AppColors.primaryGreen),
-                              SizedBox(width: 4),
-                              Text(
-                                'Settle All (Demo)',
-                                style: TextStyle(
-                                  color: AppColors.primaryGreen,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    else
-                      NeoPopButton(
-                        color: AppColors.surfaceElevated,
-                        bottomShadowColor: Colors.black,
-                        rightShadowColor: Colors.black,
-                        depth: 2.0,
-                        border: Border.all(color: AppColors.neonCyan, width: 1.2),
-                        onTapUp: _resetOrder,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.refresh_rounded, size: 13, color: AppColors.neonCyan),
-                              SizedBox(width: 4),
-                              Text(
-                                'Reset',
-                                style: TextStyle(
-                                  color: AppColors.neonCyan,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                // List of Tranche QR Cards
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: order.tranches.length,
-                  itemBuilder: (context, index) {
-                    final tranche = order.tranches[index];
-                    final isCurrentActive = !tranche.isPaid &&
-                        (index == 0 || order.tranches[index - 1].isPaid);
-
-                    return QrTrancheCard(
-                      tranche: tranche,
-                      totalTranches: order.tranches.length,
-                      isCurrentActive: isCurrentActive,
-                      onSimulatePayment: () => _simulatePayTranche(tranche),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Viral Clout Receipt Button
-                if (order.isFullyPaid)
-                  NeoPopActionButton(
-                    text: 'CLAIM & POST ZERO-MDR RECEIPT 🔥',
-                    color: AppColors.primaryGreen,
-                    textColor: Colors.black,
-                    prefixIcon: const Icon(Icons.verified_rounded, color: Colors.black, size: 18),
-                    onTap: () => CloutShareModal.show(context, order),
-                  ),
-
-                const SizedBox(height: 40),
-              ],
-            ],
-          ),
-        ),
-
-        // Confetti overlay on completion
-        ConfettiWidget(
-          confettiController: _confettiController,
-          blastDirectionality: BlastDirectionality.explosive,
-          shouldLoop: false,
-          colors: const [
-            AppColors.primaryGreen,
-            AppColors.neonCyan,
-            AppColors.goldenYellow,
-            Colors.white,
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInputCard() {
-    return NeoPopSurfaceCard(
-      backgroundColor: const Color(0xFF101012),
-      borderColor: AppColors.neoBorder,
-      depth: 4.0,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Payee Status Banner
-          InkWell(
-            onTap: scanMerchantQr,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              margin: const EdgeInsets.only(bottom: 14),
-              decoration: BoxDecoration(
-                color: _vpaController.text.isNotEmpty
-                    ? const Color(0xFF16251C)
-                    : const Color(0xFF18181B),
-                border: Border.all(
-                  color: _vpaController.text.isNotEmpty
-                      ? AppColors.primaryGreen
-                      : AppColors.cardBorder,
-                  width: 1.5,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    _vpaController.text.isNotEmpty
-                        ? Icons.verified_user_rounded
-                        : Icons.qr_code_scanner_rounded,
-                    size: 18,
-                    color: _vpaController.text.isNotEmpty
-                        ? AppColors.primaryGreen
-                        : AppColors.neonCyan,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Text(
-                          _nameController.text.isNotEmpty
-                              ? _nameController.text
-                              : (_vpaController.text.isNotEmpty
-                                  ? _vpaController.text
-                                  : 'No Merchant QR Scanned'),
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
-                            color: _vpaController.text.isNotEmpty
-                                ? AppColors.textPrimary
-                                : AppColors.textSecondary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
+                        Icon(
                           _vpaController.text.isNotEmpty
-                              ? _vpaController.text
-                              : 'Tap to Scan QR Code or set Payee VPA',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: _vpaController.text.isNotEmpty
-                                ? AppColors.primaryGreen
-                                : AppColors.textMuted,
+                              ? Icons.verified_user_rounded
+                              : Icons.qr_code_scanner_rounded,
+                          size: 20,
+                          color: _vpaController.text.isNotEmpty
+                              ? AppColors.primaryGreen
+                              : AppColors.neonCyan,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _nameController.text.isNotEmpty
+                                    ? _nameController.text
+                                    : (_vpaController.text.isNotEmpty
+                                        ? _vpaController.text
+                                        : 'Scan Merchant QR Code'),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  color: _vpaController.text.isNotEmpty
+                                      ? AppColors.textPrimary
+                                      : AppColors.textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                _vpaController.text.isNotEmpty
+                                    ? _vpaController.text
+                                    : 'Tap to scan counter standee or QR',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: _vpaController.text.isNotEmpty
+                                      ? AppColors.primaryGreen
+                                      : AppColors.textMuted,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                        NeoPopPillBadge(
+                          label: _vpaController.text.isNotEmpty ? 'CHANGE' : 'SCAN 📷',
+                          color: AppColors.primaryGreen,
+                          textColor: Colors.black,
                         ),
                       ],
                     ),
                   ),
-                  NeoPopPillBadge(
-                    label: _vpaController.text.isNotEmpty ? 'CHANGE' : 'SCAN 📷',
-                    color: AppColors.primaryGreen,
-                    textColor: Colors.black,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const Text(
-            'BILL AMOUNT (INR)',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.2,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Text(
-                '₹',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primaryGreen,
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    fontSize: 32,
+
+                const Text(
+                  'ENTER BILL AMOUNT (INR)',
+                  style: TextStyle(
+                    fontSize: 10,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
-                    letterSpacing: -1.0,
-                  ),
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: '0.00',
-                    hintStyle: TextStyle(color: AppColors.textMuted),
-                  ),
-                  onSubmitted: (_) => _generateSplitOrder(),
-                ),
-              ),
-              NeoPopButton(
-                color: AppColors.primaryGreen,
-                bottomShadowColor: Colors.black,
-                rightShadowColor: Colors.black,
-                depth: 3.0,
-                border: Border.all(color: Colors.black, width: 1.5),
-                onTapUp: _generateSplitOrder,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  child: Text(
-                    'SPLIT ⚡',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 12,
-                      letterSpacing: 0.5,
-                    ),
+                    letterSpacing: 1.2,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Quick Amount Pills (CRED NeoPOP Style)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _quickAmounts.map((amt) {
-                final isSelected = _amountController.text == amt.toStringAsFixed(0);
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: NeoPopButton(
-                    color: isSelected ? AppColors.primaryGreen : const Color(0xFF1E1E22),
-                    bottomShadowColor: Colors.black,
-                    rightShadowColor: Colors.black,
-                    depth: isSelected ? 3.0 : 1.5,
-                    border: Border.all(
-                      color: isSelected ? Colors.black : AppColors.cardBorder,
-                      width: 1.2,
-                    ),
-                    onTapUp: () {
-                      _amountController.text = amt.toStringAsFixed(0);
-                      _generateSplitOrder();
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      child: Text(
-                        '₹${amt.toStringAsFixed(0)}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          color: isSelected ? Colors.black : AppColors.textSecondary,
-                        ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Text(
+                      '₹',
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primaryGreen,
                       ),
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _amountController,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -1.0,
+                        ),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: '0',
+                          hintStyle: TextStyle(color: AppColors.textMuted),
+                        ),
+                        onChanged: (_) => _recalculateOrder(),
+                      ),
+                    ),
+                  ],
+                ),
 
-  Widget _buildSavingsBanner(SplitOrder order) {
-    return NeoPopSurfaceCard(
-      backgroundColor: const Color(0xFF00FFA3),
-      borderColor: Colors.black,
-      shadowColor: const Color(0xFF00E599),
-      depth: 4.0,
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'MDR ARBITRAGE SAVED',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                  color: Colors.black87,
+                const SizedBox(height: 12),
+
+                // Quick Amount Selection Chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _quickAmounts.map((qAmt) {
+                      final isSelected = _amountController.text == qAmt.toStringAsFixed(0);
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: NeoPopButton(
+                          color: isSelected ? AppColors.primaryGreen : const Color(0xFF1E1E22),
+                          bottomShadowColor: Colors.black,
+                          rightShadowColor: Colors.black,
+                          depth: isSelected ? 3.0 : 1.5,
+                          border: Border.all(
+                            color: isSelected ? Colors.black : AppColors.cardBorder,
+                            width: 1.2,
+                          ),
+                          onTapUp: () {
+                            _amountController.text = qAmt.toStringAsFixed(0);
+                            _recalculateOrder();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            child: Text(
+                              '₹${qAmt.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: isSelected ? Colors.black : AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '₹${order.mdrSavings.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.black,
-                  letterSpacing: -1.0,
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border.all(color: Colors.black, width: 1.5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text(
-                  'Govt 0.4% Fee',
-                  style: TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.w700),
-                ),
-                Text(
-                  '₹${order.mdrStandard.toStringAsFixed(2)} ❌',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.alertRed,
-                    decoration: TextDecoration.lineThrough,
+
+                const SizedBox(height: 16),
+
+                // MDR Arbitrage Info Banner
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF141416),
+                    border: Border.all(color: AppColors.neoBorder, width: 1.2),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.bolt, color: AppColors.primaryGreen, size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Auto-splits into $trancheCount tranches',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        'Saves ₹$potentialSavings MDR',
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.primaryGreen),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildProgressCard(SplitOrder order) {
-    return NeoPopSurfaceCard(
-      backgroundColor: const Color(0xFF101012),
-      borderColor: AppColors.neoBorder,
-      depth: 3.0,
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'SETTLED: ₹${order.paidAmount.toStringAsFixed(0)} / ₹${order.totalAmount.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.5,
-                  color: AppColors.textPrimary,
+          const SizedBox(height: 16),
+
+          // Primary Launch Checkout Modal Action
+          NeoPopActionButton(
+            text: 'PROCEED TO PAY ₹${amt.toStringAsFixed(0)} (0% MDR) ⚡',
+            color: AppColors.primaryGreen,
+            textColor: Colors.black,
+            prefixIcon: const Icon(Icons.lock_open_rounded, color: Colors.black, size: 18),
+            onTap: _openCheckoutModal,
+          ),
+
+          if (order != null && order.paidAmount > 0) ...[
+            const SizedBox(height: 16),
+            // Active Payment Status Bar
+            InkWell(
+              onTap: _openCheckoutModal,
+              child: NeoPopSurfaceCard(
+                backgroundColor: const Color(0xFF161618),
+                borderColor: AppColors.primaryGreen,
+                depth: 3.0,
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          order.isFullyPaid ? Icons.check_circle : Icons.timelapse_rounded,
+                          color: order.isFullyPaid ? AppColors.primaryGreen : AppColors.goldenYellow,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              order.isFullyPaid ? 'Bill Fully Settled' : 'Payment In Progress',
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.white),
+                            ),
+                            Text(
+                              '₹${order.paidAmount.toStringAsFixed(0)} / ₹${order.totalAmount.toStringAsFixed(0)} Settled',
+                              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const NeoPopPillBadge(
+                      label: 'RESUME →',
+                      color: AppColors.primaryGreen,
+                      textColor: Colors.black,
+                    ),
+                  ],
                 ),
               ),
-              NeoPopPillBadge(
-                label: '${(order.progress * 100).toInt()}%',
-                color: order.isFullyPaid ? AppColors.primaryGreen : AppColors.neonCyan,
-                textColor: Colors.black,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Container(
-            height: 8,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E22),
-              border: Border.all(color: AppColors.neoBorder, width: 1.0),
             ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: order.progress.clamp(0.0, 1.0),
-              child: Container(
-                color: AppColors.primaryGreen,
-              ),
-            ),
-          ),
+          ],
         ],
       ),
     );

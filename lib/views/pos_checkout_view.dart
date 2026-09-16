@@ -123,7 +123,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             boxShadow: [
               BoxShadow(
-                color: isDark ? Colors.black.withAlpha(180) : Colors.black.withAlpha(30),
+                color: isDark
+                    ? Colors.black.withAlpha(180)
+                    : Colors.black.withAlpha(30),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -177,7 +179,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 ),
                 decoration: BoxDecoration(
                   color: isDark ? Colors.black : const Color(0xFFF1F5F9),
-                  border: Border.all(color: AppColors.border(context), width: 1.2),
+                  border: Border.all(
+                    color: AppColors.border(context),
+                    width: 1.2,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: TextField(
@@ -226,8 +231,12 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
-                            border: Border.all(color: AppColors.primaryBlue.withAlpha(100)),
+                            color: isDark
+                                ? AppColors.blueSurface
+                                : const Color(0xFFE8F0FE),
+                            border: Border.all(
+                              color: AppColors.primaryBlue.withAlpha(100),
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -265,7 +274,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 ),
                 decoration: BoxDecoration(
                   color: isDark ? Colors.black : const Color(0xFFF1F5F9),
-                  border: Border.all(color: AppColors.border(context), width: 1.2),
+                  border: Border.all(
+                    color: AppColors.border(context),
+                    width: 1.2,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: TextField(
@@ -297,7 +309,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF14151B) : const Color(0xFFF1F5F9),
+                    color: isDark
+                        ? const Color(0xFF14151B)
+                        : const Color(0xFFF1F5F9),
                     border: Border.all(color: AppColors.border(context)),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -569,22 +583,24 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   depth: 4,
                   child: Stack(
                     children: [
-                      // Subdued Banknote Security Watermark with Seamless Radial Fade Mask
+                      // Prominent Banknote Security Watermark with Seamless Radial Fade Mask
                       Positioned(
-                        right: -10,
-                        top: -10,
-                        bottom: -10,
+                        right: 0,
+                        top: 0,
+                        bottom: 35,
                         child: IgnorePointer(
                           child: ShaderMask(
                             shaderCallback: (rect) {
                               return RadialGradient(
                                 center: Alignment.center,
-                                radius: 0.65,
+                                radius: 0.85,
                                 colors: [
-                                  Colors.white.withOpacity(isDark ? 0.14 : 0.08),
+                                  Colors.white.withOpacity(
+                                    isDark ? 0.36 : 0.42,
+                                  ),
                                   Colors.transparent,
                                 ],
-                                stops: const [0.3, 1.0],
+                                stops: const [0.55, 1.0],
                               ).createShader(rect);
                             },
                             blendMode: BlendMode.dstIn,

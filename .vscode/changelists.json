@@ -3,8 +3,7 @@
     {
       "name": "Default",
       "files": [
-        "lib/views/pos_checkout_view.dart",
-        ".vscode/changelists.json"
+        "lib/views/pos_checkout_view.dart"
       ]
     }
   ],

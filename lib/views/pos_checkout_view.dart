@@ -606,7 +606,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             blendMode: BlendMode.dstIn,
                             child: Image.asset(
                               'assets/images/gandhi_currency.png',
-                              color: isDark ? Colors.white : AppColors.primaryBlue,
+                              color: isDark
+                                  ? Colors.white
+                                  : AppColors.primaryBlue,
                               colorBlendMode: BlendMode.srcIn,
                               fit: BoxFit.contain,
                             ),

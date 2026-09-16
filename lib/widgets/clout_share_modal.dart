@@ -61,12 +61,19 @@ class CloutShareModal extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(4),
+                      width: 26,
+                      height: 26,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primaryBlue.withAlpha(180),
+                          width: 1.2,
+                        ),
+                        image: const DecorationImage(
+                          image: AssetImage('assets/images/gandhi_avatar.png'),
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      child: const Icon(Icons.check_rounded, color: AppColors.primaryBlue, size: 14),
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -90,125 +97,176 @@ class CloutShareModal extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            // Receipt Container
+            // Receipt Container with Banknote Watermark
             Container(
-              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF1A1A1E) : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border(context)),
               ),
-              child: Column(
+              child: Stack(
                 children: [
-                  // Merchant & VPA
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  // Subtle Banknote Background Watermark
+                  Positioned(
+                    right: -10,
+                    bottom: -10,
+                    child: IgnorePointer(
+                      child: ShaderMask(
+                        shaderCallback: (rect) {
+                          return RadialGradient(
+                            center: Alignment.center,
+                            radius: 0.8,
+                            colors: [
+                              Colors.white.withOpacity(isDark ? 0.16 : 0.18),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.4, 1.0],
+                          ).createShader(rect);
+                        },
+                        blendMode: BlendMode.dstIn,
+                        child: Image.asset(
+                          'assets/images/gandhi_currency.png',
+                          width: 130,
+                          height: 130,
+                          color: isDark ? Colors.white : AppColors.primaryBlue,
+                          colorBlendMode: BlendMode.srcIn,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Receipt Body
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // Merchant & VPA
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              order.merchantName,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.text(context),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    order.merchantName,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.text(context),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    order.merchantVpa,
+                                    style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                            Text(
-                              order.merchantVpa,
-                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text(
+                                '100% Settled',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryBlue,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
-                          borderRadius: BorderRadius.circular(6),
+
+                        const SizedBox(height: 14),
+                        Divider(color: AppColors.border(context), height: 1),
+                        const SizedBox(height: 14),
+
+                        // Amount Settled
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total Settled',
+                              style: TextStyle(fontSize: 12, color: AppColors.textSub(context), fontWeight: FontWeight.w500),
+                            ),
+                            Text(
+                              '₹${order.totalAmount.toStringAsFixed(2)}',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.text(context)),
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          '100% Settled',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primaryBlue,
+
+                        const SizedBox(height: 10),
+
+                        // MDR Saved Highlight with Gandhi Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.primaryBlue.withAlpha(60)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: AppColors.primaryBlue.withAlpha(160),
+                                        width: 1.0,
+                                      ),
+                                      image: const DecorationImage(
+                                        image: AssetImage('assets/images/gandhi_avatar.png'),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Gandhis Retained',
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryBlue),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                '+₹${order.mdrSavings.toStringAsFixed(2)}',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.primaryBlue),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
 
-                  const SizedBox(height: 14),
-                  Divider(color: AppColors.border(context), height: 1),
-                  const SizedBox(height: 14),
+                        const SizedBox(height: 10),
 
-                  // Amount Settled
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total Settled',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSub(context), fontWeight: FontWeight.w500),
-                      ),
-                      Text(
-                        '₹${order.totalAmount.toStringAsFixed(2)}',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.text(context)),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // MDR Saved Highlight
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.primaryBlue.withAlpha(60)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Row(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(Icons.bolt, color: AppColors.primaryBlue, size: 16),
-                            SizedBox(width: 6),
-                            Text(
-                              'MDR Surcharge Saved',
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
+                            const Text(
+                              '0% MDR Tranching Engine',
+                              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                            ),
+                            const Text(
+                              '0% MDR Certified',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
                             ),
                           ],
-                        ),
-                        Text(
-                          '+₹${order.mdrSavings.toStringAsFixed(2)}',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.primaryBlue),
                         ),
                       ],
                     ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '0% MDR Tranching Engine',
-                        style: TextStyle(fontSize: 11, color: AppColors.textMuted),
-                      ),
-                      const Text(
-                        '0% MDR Certified',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
-                      ),
-                    ],
                   ),
                 ],
               ),

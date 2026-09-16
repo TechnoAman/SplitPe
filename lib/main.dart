@@ -25,11 +25,34 @@ class SplitPeApp extends StatelessWidget {
       valueListenable: ThemeController.themeMode,
       builder: (context, currentMode, _) {
         return MaterialApp(
-          title: 'SplitPe - 0% MDR UPI Tranche Engine',
+          title: 'SplitPe · 0% MDR UPI Engine',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: currentMode,
+          builder: (context, child) {
+            final isDark = ThemeController.isDark(context);
+            return Container(
+              color: isDark ? const Color(0xFF07080A) : const Color(0xFFE2E8F0),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    color: AppColors.bg(context),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(isDark ? 0.6 : 0.12),
+                        blurRadius: 30,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: child ?? const SizedBox.shrink(),
+                ),
+              ),
+            );
+          },
           home: const HomeScreen(),
         );
       },

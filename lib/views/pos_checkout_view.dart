@@ -894,12 +894,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                           color: AppColors.chipBg(context),
                           child: Row(
                             children: [
-                               Container(
+                              Container(
                                 width: 30,
                                 height: 30,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                                  color: isDark
+                                      ? AppColors.blueSurface
+                                      : const Color(0xFFE8F0FE),
                                   border: Border.all(
                                     color: AppColors.primaryBlue.withAlpha(160),
                                     width: 1.5,

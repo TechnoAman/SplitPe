@@ -217,21 +217,29 @@ class CloutShareModal extends StatelessWidget {
                             border: Border.all(color: AppColors.primaryBlue.withAlpha(60)),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Row(
-                                children: [
-                                  Icon(Icons.bolt, color: AppColors.primaryBlue, size: 16),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Gandhis Retained (MDR Saved)',
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryBlue),
+                              const Icon(Icons.bolt, color: AppColors.primaryBlue, size: 16),
+                              const SizedBox(width: 6),
+                              const Expanded(
+                                child: Text(
+                                  'MDR Surcharge Saved',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primaryBlue,
                                   ),
-                                ],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 '+₹${order.mdrSavings.toStringAsFixed(2)}',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.primaryBlue),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.primaryBlue,
+                                ),
                               ),
                             ],
                           ),
@@ -240,12 +248,16 @@ class CloutShareModal extends StatelessWidget {
                         const SizedBox(height: 10),
 
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              '0% MDR Tranching Engine',
-                              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                            const Expanded(
+                              child: Text(
+                                '0% MDR Tranching Engine',
+                                style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
+                            const SizedBox(width: 6),
                             const Text(
                               '0% MDR Certified',
                               style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),

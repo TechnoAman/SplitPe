@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/split_order.dart';
-import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
+import 'neopop_components.dart';
 
 class CloutShareModal extends StatelessWidget {
   final SplitOrder order;
@@ -31,12 +31,11 @@ class CloutShareModal extends StatelessWidget {
     final twitterUrl = 'https://twitter.com/intent/tweet?text=$tweetText';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
       decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        color: Color(0xFF0A0A0C),
         border: Border(
-          top: BorderSide(color: AppColors.primaryGreen, width: 2),
+          top: BorderSide(color: AppColors.primaryGreen, width: 2.0),
         ),
       ),
       child: SafeArea(
@@ -45,137 +44,135 @@ class CloutShareModal extends StatelessWidget {
           children: [
             // Drag handle
             Container(
-              width: 40,
+              width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.textMuted.withAlpha(100),
+                color: const Color(0xFF27272A),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
 
             // Header
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryGreen,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.verified_rounded, color: Colors.black, size: 20),
-                ),
-                const SizedBox(width: 10),
-                const Text(
-                  'ZERO-MDR RECEIPT',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                    color: AppColors.textPrimary,
-                  ),
+                NeoPopPillBadge(
+                  label: 'ZERO-MDR VERIFIED RECEIPT',
+                  color: AppColors.primaryGreen,
+                  textColor: Colors.black,
+                  icon: Icon(Icons.verified_rounded, color: Colors.black, size: 14),
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
-            // The Luxe Receipt Card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: AppColors.cardGradient,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.cardBorder),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryGreen.withAlpha(20),
-                    blurRadius: 20,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
+            // The CRED NeoPOP Receipt Card
+            NeoPopSurfaceCard(
+              backgroundColor: const Color(0xFF141416),
+              borderColor: AppColors.primaryGreen,
+              shadowColor: AppColors.primaryGreen.withAlpha(120),
+              depth: 4.0,
+              padding: const EdgeInsets.all(18),
               child: Column(
                 children: [
                   // Merchant & Time
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            order.merchantName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              order.merchantName.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textPrimary,
+                                letterSpacing: 0.8,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          Text(
-                            order.merchantVpa,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
+                            Text(
+                              order.merchantVpa,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textMuted,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGreen.withAlpha(30),
-                          borderRadius: BorderRadius.circular(6),
+                          ],
                         ),
-                        child: const Text(
-                          '100% EXEMPT',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primaryGreen,
-                          ),
+                      ),
+                      const NeoPopPillBadge(
+                        label: '100% SETTLED',
+                        color: Color(0xFF1E1E22),
+                        textColor: AppColors.primaryGreen,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
+                  const Divider(color: Color(0xFF27272A), thickness: 1),
+                  const SizedBox(height: 14),
+
+                  // Big Amount Paid
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'TOTAL SETTLED',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.0,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Text(
+                        '₹${order.totalAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ],
                   ),
 
-                  const Divider(color: AppColors.cardBorder, height: 28),
+                  const SizedBox(height: 10),
 
-                  // Numbers breakdown
-                  _buildReceiptRow('Total Bill Amount', '₹${order.totalAmount.toStringAsFixed(2)}'),
-                  const SizedBox(height: 8),
-                  _buildReceiptRow('Tranches Processed', '${order.tranches.length} sub-₹2,000 splits'),
-                  const SizedBox(height: 8),
-                  _buildReceiptRow('Standard 0.4% MDR', '₹${order.mdrStandard.toStringAsFixed(2)}', isCrossed: true),
-                  const SizedBox(height: 8),
-                  _buildReceiptRow('SplitPe MDR Charged', '₹0.00', isGreen: true),
-
-                  const Divider(color: AppColors.cardBorder, height: 28),
-
-                  // Highlighted Savings
+                  // MDR Surcharge Avoided (Hero Metric)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryGreen.withAlpha(25),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primaryGreen.withAlpha(120)),
+                      color: AppColors.primaryGreen.withAlpha(20),
+                      border: Border.all(color: AppColors.primaryGreen.withAlpha(100)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'TOTAL SAVED',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.0,
-                            color: AppColors.primaryGreen,
-                          ),
+                        const Row(
+                          children: [
+                            Icon(Icons.bolt, color: AppColors.primaryGreen, size: 16),
+                            SizedBox(width: 6),
+                            Text(
+                              'MDR Surcharge Avoided',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryGreen,
+                              ),
+                            ),
+                          ],
                         ),
                         Text(
-                          '₹${order.mdrSavings.toStringAsFixed(2)}',
+                          '+₹${order.mdrSavings.toStringAsFixed(2)}',
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 14,
                             fontWeight: FontWeight.w900,
                             color: AppColors.primaryGreen,
                           ),
@@ -183,54 +180,56 @@ class CloutShareModal extends StatelessWidget {
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 12),
+
+                  // Tranches list summary
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Split into ${order.tranches.length} sub-₹2,000 tranches',
+                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                      ),
+                      const Text(
+                        '0% MDR Certified',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.neonCyan),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
-            // Share Buttons
+            // Share CTA Buttons
             Row(
               children: [
-                // Post to X / Twitter
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      final uri = Uri.parse(twitterUrl);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      }
+                  child: NeoPopActionButton(
+                    text: 'POST ON X 🔥',
+                    color: Colors.white,
+                    textColor: Colors.black,
+                    prefixIcon: const Icon(Icons.send_rounded, color: Colors.black, size: 14),
+                    onTap: () {
+                      launchUrl(Uri.parse(twitterUrl), mode: LaunchMode.externalApplication);
                     },
-                    icon: const Icon(Icons.rocket_launch_rounded, size: 18, color: Colors.black),
-                    label: const Text(
-                      'Post on X / Twitter',
-                      style: TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGreen,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Native Share / WhatsApp
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.cardBorder),
-                  ),
-                  child: IconButton(
-                    onPressed: () async {
-                      final shareMsg = UpiService.generateViralShareText(
-                        totalAmount: order.totalAmount,
-                        mdrSaved: order.mdrSavings,
-                        trancheCount: order.tranches.length,
-                      );
-                      await SharePlus.instance.share(ShareParams(text: shareMsg));
+                Expanded(
+                  child: NeoPopActionButton(
+                    text: 'WHATSAPP 💬',
+                    color: AppColors.primaryGreen,
+                    textColor: Colors.black,
+                    prefixIcon: const Icon(Icons.share_rounded, color: Colors.black, size: 14),
+                    onTap: () {
+                      final msg = '⚡ Just settled a ₹${order.totalAmount.toStringAsFixed(0)} bill with ₹0 MDR using SplitPe!\n'
+                          'Saved ₹${order.mdrSavings.toStringAsFixed(2)} in gateway fees.\n'
+                          'Check out SplitPe!';
+                      SharePlus.instance.share(ShareParams(text: msg));
                     },
-                    icon: const Icon(Icons.share_rounded, color: AppColors.textPrimary),
-                    tooltip: 'Share Receipt',
                   ),
                 ),
               ],
@@ -238,35 +237,6 @@ class CloutShareModal extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildReceiptRow(String title, String value, {bool isCrossed = false, bool isGreen = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            decoration: isCrossed ? TextDecoration.lineThrough : null,
-            decorationColor: AppColors.alertRed,
-            color: isGreen
-                ? AppColors.primaryGreen
-                : isCrossed
-                    ? AppColors.alertRed
-                    : AppColors.textPrimary,
-          ),
-        ),
-      ],
     );
   }
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:neopop/neopop.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
 import '../services/split_engine.dart';
 import '../theme/app_theme.dart';
 import '../widgets/clout_share_modal.dart';
+import '../widgets/neopop_components.dart';
 import '../widgets/qr_tranche_card.dart';
 import '../widgets/soundbox_speaker_widget.dart';
 import 'qr_scanner_view.dart';
@@ -64,7 +66,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('⚡ Scanned Payee: ${_nameController.text.isNotEmpty ? _nameController.text : _vpaController.text}'),
+        content: Text(
+          '⚡ Scanned Payee: ${_nameController.text.isNotEmpty ? _nameController.text : _vpaController.text}',
+          style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.black),
+        ),
         backgroundColor: AppColors.primaryGreen,
         duration: const Duration(seconds: 2),
       ),
@@ -153,7 +158,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
       alignment: Alignment.topCenter,
       children: [
         SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -163,18 +168,18 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 isPlaying: order?.isFullyPaid ?? false,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-              // Input Amount & Config Card
+              // CRED NeoPOP Input Amount & Config Card
               _buildInputCard(),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               if (order != null) ...[
-                // MDR Savings Summary Banner
+                // CRED NeoPOP MDR Savings Summary Banner
                 _buildSavingsBanner(order),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
                 // Order Progress Indicator
                 _buildProgressCard(order),
@@ -188,42 +193,70 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                     Text(
                       'ACTIVE TRANCHES (${order.tranches.length})',
                       style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.1,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     if (!order.isFullyPaid)
-                      TextButton.icon(
-                        onPressed: _simulatePayAll,
-                        icon: const Icon(Icons.flash_on_rounded, size: 16, color: AppColors.primaryGreen),
-                        label: const Text(
-                          'Settle All (Demo)',
-                          style: TextStyle(
-                            color: AppColors.primaryGreen,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
+                      NeoPopButton(
+                        color: AppColors.surfaceElevated,
+                        bottomShadowColor: Colors.black,
+                        rightShadowColor: Colors.black,
+                        depth: 2.0,
+                        border: Border.all(color: AppColors.primaryGreen, width: 1.2),
+                        onTapUp: _simulatePayAll,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.flash_on_rounded, size: 13, color: AppColors.primaryGreen),
+                              SizedBox(width: 4),
+                              Text(
+                                'Settle All (Demo)',
+                                style: TextStyle(
+                                  color: AppColors.primaryGreen,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       )
                     else
-                      TextButton.icon(
-                        onPressed: _resetOrder,
-                        icon: const Icon(Icons.refresh_rounded, size: 16, color: AppColors.neonCyan),
-                        label: const Text(
-                          'Reset',
-                          style: TextStyle(
-                            color: AppColors.neonCyan,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
+                      NeoPopButton(
+                        color: AppColors.surfaceElevated,
+                        bottomShadowColor: Colors.black,
+                        rightShadowColor: Colors.black,
+                        depth: 2.0,
+                        border: Border.all(color: AppColors.neonCyan, width: 1.2),
+                        onTapUp: _resetOrder,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.refresh_rounded, size: 13, color: AppColors.neonCyan),
+                              SizedBox(width: 4),
+                              Text(
+                                'Reset',
+                                style: TextStyle(
+                                  color: AppColors.neonCyan,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                   ],
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
 
                 // List of Tranche QR Cards
                 ListView.builder(
@@ -248,15 +281,12 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
                 // Viral Clout Receipt Button
                 if (order.isFullyPaid)
-                  ElevatedButton.icon(
-                    onPressed: () => CloutShareModal.show(context, order),
-                    icon: const Icon(Icons.verified_rounded, color: Colors.black),
-                    label: const Text('Claim & Post Zero-MDR Receipt 🔥'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGreen,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
+                  NeoPopActionButton(
+                    text: 'CLAIM & POST ZERO-MDR RECEIPT 🔥',
+                    color: AppColors.primaryGreen,
+                    textColor: Colors.black,
+                    prefixIcon: const Icon(Icons.verified_rounded, color: Colors.black, size: 18),
+                    onTap: () => CloutShareModal.show(context, order),
                   ),
 
                 const SizedBox(height: 40),
@@ -282,32 +312,29 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   }
 
   Widget _buildInputCard() {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
+    return NeoPopSurfaceCard(
+      backgroundColor: const Color(0xFF101012),
+      borderColor: AppColors.neoBorder,
+      depth: 4.0,
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Payee Status Banner
           InkWell(
             onTap: scanMerchantQr,
-            borderRadius: BorderRadius.circular(12),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               margin: const EdgeInsets.only(bottom: 14),
               decoration: BoxDecoration(
                 color: _vpaController.text.isNotEmpty
-                    ? AppColors.primaryGreen.withAlpha(20)
-                    : AppColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(12),
+                    ? const Color(0xFF16251C)
+                    : const Color(0xFF18181B),
                 border: Border.all(
                   color: _vpaController.text.isNotEmpty
-                      ? AppColors.primaryGreen.withAlpha(120)
+                      ? AppColors.primaryGreen
                       : AppColors.cardBorder,
+                  width: 1.5,
                 ),
               ),
               child: Row(
@@ -334,7 +361,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   : 'No Merchant QR Scanned'),
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w900,
                             color: _vpaController.text.isNotEmpty
                                 ? AppColors.textPrimary
                                 : AppColors.textSecondary,
@@ -348,6 +375,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                               : 'Tap to Scan QR Code or set Payee VPA',
                           style: TextStyle(
                             fontSize: 11,
+                            fontWeight: FontWeight.w600,
                             color: _vpaController.text.isNotEmpty
                                 ? AppColors.primaryGreen
                                 : AppColors.textMuted,
@@ -358,41 +386,26 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryGreen,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      _vpaController.text.isNotEmpty ? 'Change' : 'Scan 📷',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.black,
-                      ),
-                    ),
+                  NeoPopPillBadge(
+                    label: _vpaController.text.isNotEmpty ? 'CHANGE' : 'SCAN 📷',
+                    color: AppColors.primaryGreen,
+                    textColor: Colors.black,
                   ),
                 ],
               ),
             ),
           ),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'BILL AMOUNT (INR)',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.0,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
+          const Text(
+            'BILL AMOUNT (INR)',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
+              color: AppColors.textSecondary,
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Row(
             children: [
               const Text(
@@ -412,6 +425,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textPrimary,
+                    letterSpacing: -1.0,
                   ),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -421,21 +435,32 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   onSubmitted: (_) => _generateSplitOrder(),
                 ),
               ),
-              ElevatedButton(
-                onPressed: _generateSplitOrder,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              NeoPopButton(
+                color: AppColors.primaryGreen,
+                bottomShadowColor: Colors.black,
+                rightShadowColor: Colors.black,
+                depth: 3.0,
+                border: Border.all(color: Colors.black, width: 1.5),
+                onTapUp: _generateSplitOrder,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  child: Text(
+                    'SPLIT ⚡',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
-                child: const Text('Split ⚡', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800)),
               ),
             ],
           ),
 
           const SizedBox(height: 12),
 
-          // Quick Amount Pills
+          // Quick Amount Pills (CRED NeoPOP Style)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -443,26 +468,26 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 final isSelected = _amountController.text == amt.toStringAsFixed(0);
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: InkWell(
-                    onTap: () {
+                  child: NeoPopButton(
+                    color: isSelected ? AppColors.primaryGreen : const Color(0xFF1E1E22),
+                    bottomShadowColor: Colors.black,
+                    rightShadowColor: Colors.black,
+                    depth: isSelected ? 3.0 : 1.5,
+                    border: Border.all(
+                      color: isSelected ? Colors.black : AppColors.cardBorder,
+                      width: 1.2,
+                    ),
+                    onTapUp: () {
                       _amountController.text = amt.toStringAsFixed(0);
                       _generateSplitOrder();
                     },
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryGreen : AppColors.surfaceElevated,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isSelected ? AppColors.primaryGreen : AppColors.cardBorder,
-                        ),
-                      ),
                       child: Text(
                         '₹${amt.toStringAsFixed(0)}',
                         style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
                           color: isSelected ? Colors.black : AppColors.textSecondary,
                         ),
                       ),
@@ -478,19 +503,12 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   }
 
   Widget _buildSavingsBanner(SplitOrder order) {
-    return Container(
+    return NeoPopSurfaceCard(
+      backgroundColor: const Color(0xFF00FFA3),
+      borderColor: Colors.black,
+      shadowColor: const Color(0xFF00E599),
+      depth: 4.0,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: AppColors.accentGradient,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryGreen.withAlpha(40),
-            blurRadius: 16,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -500,9 +518,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
               const Text(
                 'MDR ARBITRAGE SAVED',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.w900,
-                  letterSpacing: 1.1,
+                  letterSpacing: 1.2,
                   color: Colors.black87,
                 ),
               ),
@@ -513,29 +531,29 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
                   color: Colors.black,
-                  letterSpacing: -0.5,
+                  letterSpacing: -1.0,
                 ),
               ),
             ],
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.black.withAlpha(180),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.black,
+              border: Border.all(color: Colors.black, width: 1.5),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 const Text(
                   'Govt 0.4% Fee',
-                  style: TextStyle(fontSize: 11, color: Colors.white70),
+                  style: TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.w700),
                 ),
                 Text(
                   '₹${order.mdrStandard.toStringAsFixed(2)} ❌',
                   style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
                     color: AppColors.alertRed,
                     decoration: TextDecoration.lineThrough,
                   ),
@@ -549,44 +567,45 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   }
 
   Widget _buildProgressCard(SplitOrder order) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.cardBorder),
-      ),
+    return NeoPopSurfaceCard(
+      backgroundColor: const Color(0xFF101012),
+      borderColor: AppColors.neoBorder,
+      depth: 3.0,
+      padding: const EdgeInsets.all(14),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Settled: ₹${order.paidAmount.toStringAsFixed(0)} / ₹${order.totalAmount.toStringAsFixed(0)}',
+                'SETTLED: ₹${order.paidAmount.toStringAsFixed(0)} / ₹${order.totalAmount.toStringAsFixed(0)}',
                 style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
                   color: AppColors.textPrimary,
                 ),
               ),
-              Text(
-                '${(order.progress * 100).toInt()}%',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primaryGreen,
-                ),
+              NeoPopPillBadge(
+                label: '${(order.progress * 100).toInt()}%',
+                color: order.isFullyPaid ? AppColors.primaryGreen : AppColors.neonCyan,
+                textColor: Colors.black,
               ),
             ],
           ),
           const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: order.progress,
-              backgroundColor: AppColors.surfaceElevated,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
-              minHeight: 8,
+          Container(
+            height: 8,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E22),
+              border: Border.all(color: AppColors.neoBorder, width: 1.0),
+            ),
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: order.progress.clamp(0.0, 1.0),
+              child: Container(
+                color: AppColors.primaryGreen,
+              ),
             ),
           ),
         ],

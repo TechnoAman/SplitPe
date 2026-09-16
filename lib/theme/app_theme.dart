@@ -2,40 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Backgrounds
-  static const Color background = Color(0xFF090C10);
-  static const Color surface = Color(0xFF131822);
-  static const Color surfaceElevated = Color(0xFF1B2230);
-  static const Color cardBorder = Color(0xFF263248);
+  // CRED Obsidian Jet Black Surfaces
+  static const Color background = Color(0xFF000000);
+  static const Color surface = Color(0xFF0D0D0D);
+  static const Color surfaceElevated = Color(0xFF161616);
+  static const Color surfaceCard = Color(0xFF1C1C1E);
+  static const Color cardBorder = Color(0xFF2C2C2E);
+  static const Color neoBorder = Color(0xFF38383A);
 
-  // Neon & Brand Accents
-  static const Color primaryGreen = Color(0xFF00F59B);
-  static const Color emeraldDark = Color(0xFF00875A);
+  // CRED NeoPOP Vibrant Accents
+  static const Color primaryGreen = Color(0xFF00FFA3);
+  static const Color emeraldDark = Color(0xFF00995E);
   static const Color neonCyan = Color(0xFF00E5FF);
-  static const Color electricPurple = Color(0xFF9D4EDD);
-  static const Color goldenYellow = Color(0xFFFFD166);
+  static const Color electricPurple = Color(0xFF7000FF);
+  static const Color goldenYellow = Color(0xFFFFE600);
   static const Color alertRed = Color(0xFFFF3366);
+  static const Color neoWhite = Color(0xFFFFFFFF);
 
-  // Text
-  static const Color textPrimary = Color(0xFFF0F4F8);
-  static const Color textSecondary = Color(0xFF94A3B8);
-  static const Color textMuted = Color(0xFF64748B);
+  // Text Hierarchy
+  static const Color textPrimary = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFFA1A1AA);
+  static const Color textMuted = Color(0xFF71717A);
 
-  // Gradients
+  // NeoPOP Gradients
   static const LinearGradient greenGradient = LinearGradient(
-    colors: [Color(0xFF00F59B), Color(0xFF00D4AA)],
+    colors: [Color(0xFF00FFA3), Color(0xFF00D287)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient cardGradient = LinearGradient(
-    colors: [Color(0xFF151C28), Color(0xFF0F141E)],
+    colors: [Color(0xFF18181B), Color(0xFF09090B)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
 
   static const LinearGradient accentGradient = LinearGradient(
-    colors: [Color(0xFF00F59B), Color(0xFF00E5FF)],
+    colors: [Color(0xFF00FFA3), Color(0xFF00E5FF)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -53,7 +56,7 @@ class AppTheme {
         surface: AppColors.surface,
         error: AppColors.alertRed,
       ),
-      textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme).apply(
+      textTheme: GoogleFonts.spaceGroteskTextTheme(ThemeData.dark().textTheme).apply(
         bodyColor: AppColors.textPrimary,
         displayColor: AppColors.textPrimary,
       ),

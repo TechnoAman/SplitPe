@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/neopop_components.dart';
 
 class SavingsCalculatorView extends StatefulWidget {
   const SavingsCalculatorView({super.key});
@@ -26,7 +26,7 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
 
   String get _roastCommentary {
     if (_annualMdrLoss >= 100000) {
-      return '💸 You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr! That is literally a brand new MacBook Pro or a trip to Bali funded for payment gateways.';
+      return '💸 You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr! That is literally a brand new M3 MacBook Pro or a Bali trip funded for payment gateways.';
     } else if (_annualMdrLoss >= 30000) {
       return '☕ You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr! That is 1,500 cups of premium filter coffee down the drain.';
     } else {
@@ -37,55 +37,38 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Viral Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2E1065), Color(0xFF1E1B4B)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.electricPurple.withAlpha(120)),
-            ),
+          // CRED NeoPOP Viral Header
+          NeoPopSurfaceCard(
+            backgroundColor: const Color(0xFF1B112C),
+            borderColor: AppColors.electricPurple,
+            depth: 4.0,
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.alertRed.withAlpha(40),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: AppColors.alertRed),
-                      ),
-                      child: const Text(
-                        '0.4% MDR ROAST',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.alertRed,
-                        ),
-                      ),
+                    NeoPopPillBadge(
+                      label: '0.4% MDR ROAST 🔥',
+                      color: AppColors.alertRed,
+                      textColor: Colors.white,
                     ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Tax Arbitrage Engine',
-                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    SizedBox(width: 8),
+                    Text(
+                      'Arbitrage Engine',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'How Much Does The New MDR Cost Your Business?',
+                  'HOW MUCH DOES THE NEW MDR COST YOUR BUSINESS?',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
                     letterSpacing: -0.5,
@@ -95,152 +78,168 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Sliders & Controls
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
+          // Sliders & Controls (CRED NeoPOP Card)
+          NeoPopSurfaceCard(
+            backgroundColor: const Color(0xFF101012),
+            borderColor: AppColors.neoBorder,
+            depth: 4.0,
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Monthly Revenue
+                // Monthly Turnover Slider
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Monthly UPI Turnover',
+                      'MONTHLY UPI TURNOVER',
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Text(
                       _currencyFormat.format(_monthlyTurnover),
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.primaryGreen,
+                        color: AppColors.goldenYellow,
                       ),
                     ),
                   ],
                 ),
-                Slider(
-                  value: _monthlyTurnover,
-                  min: 100000,
-                  max: 10000000,
-                  divisions: 99,
-                  activeColor: AppColors.primaryGreen,
-                  inactiveColor: AppColors.surfaceElevated,
-                  onChanged: (val) {
-                    setState(() {
-                      _monthlyTurnover = val;
-                    });
-                  },
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: AppColors.goldenYellow,
+                    thumbColor: AppColors.goldenYellow,
+                    inactiveTrackColor: const Color(0xFF27272A),
+                    trackHeight: 6,
+                  ),
+                  child: Slider(
+                    value: _monthlyTurnover,
+                    min: 100000,
+                    max: 10000000,
+                    divisions: 99,
+                    onChanged: (val) {
+                      setState(() {
+                        _monthlyTurnover = val;
+                      });
+                    },
+                  ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 14),
 
-                // Average Bill Size
+                // Average Bill Size Slider
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Average Order Value (AOV)',
+                      'AVERAGE TICKET / BILL SIZE',
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Text(
                       _currencyFormat.format(_avgBillSize),
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
                         color: AppColors.neonCyan,
                       ),
                     ),
                   ],
                 ),
-                Slider(
-                  value: _avgBillSize,
-                  min: 500,
-                  max: 25000,
-                  divisions: 49,
-                  activeColor: AppColors.neonCyan,
-                  inactiveColor: AppColors.surfaceElevated,
-                  onChanged: (val) {
-                    setState(() {
-                      _avgBillSize = val;
-                    });
-                  },
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: AppColors.neonCyan,
+                    thumbColor: AppColors.neonCyan,
+                    inactiveTrackColor: const Color(0xFF27272A),
+                    trackHeight: 6,
+                  ),
+                  child: Slider(
+                    value: _avgBillSize,
+                    min: 500,
+                    max: 50000,
+                    divisions: 99,
+                    onChanged: (val) {
+                      setState(() {
+                        _avgBillSize = val;
+                      });
+                    },
+                  ),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Savings Impact Grid
+          // Output Numbers: Annual MDR Loss vs SplitPe Savings
           Row(
             children: [
-              // Monthly Loss
+              // Loss Box
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.alertRed.withAlpha(20),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.alertRed.withAlpha(100)),
-                  ),
+                child: NeoPopSurfaceCard(
+                  backgroundColor: const Color(0xFF251016),
+                  borderColor: AppColors.alertRed,
+                  depth: 3.0,
+                  padding: const EdgeInsets.all(14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'MONTHLY TAX DRAIN',
+                        'ANNUAL GATEWAY LOSS',
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
                           color: AppColors.alertRed,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        _currencyFormat.format(_monthlyMdrLoss),
+                        _currencyFormat.format(_annualMdrLoss),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
                           color: AppColors.alertRed,
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Paid to banks/aggregators',
+                        style: TextStyle(fontSize: 10, color: AppColors.textMuted),
+                      ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              // Annual Savings with SplitPe
+              const SizedBox(width: 10),
+
+              // SplitPe 0% MDR Box
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withAlpha(20),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primaryGreen.withAlpha(100)),
-                  ),
+                child: NeoPopSurfaceCard(
+                  backgroundColor: const Color(0xFF0C2417),
+                  borderColor: AppColors.primaryGreen,
+                  depth: 3.0,
+                  padding: const EdgeInsets.all(14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'SAVED / YR ON SPLITPE',
+                        'SPLITPE SAVINGS',
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
                           color: AppColors.primaryGreen,
                         ),
                       ),
@@ -253,6 +252,11 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                           color: AppColors.primaryGreen,
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        '100% Retained via 0% MDR',
+                        style: TextStyle(fontSize: 10, color: AppColors.textMuted),
+                      ),
                     ],
                   ),
                 ),
@@ -260,114 +264,57 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Roast commentary card
-          Container(
+          // Roast Commentary Box
+          NeoPopSurfaceCard(
+            backgroundColor: const Color(0xFF141416),
+            borderColor: AppColors.goldenYellow,
+            depth: 3.0,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceElevated,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('🔥', style: TextStyle(fontSize: 22)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _roastCommentary,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Tweet this calculation button
-          ElevatedButton.icon(
-            onPressed: () async {
-              final tweetText = Uri.encodeComponent(
-                'According to @SplitPe calculator, businesses doing ${_currencyFormat.format(_monthlyTurnover)}/mo are losing ${_currencyFormat.format(_annualMdrLoss)}/year to the new 0.4% UPI MDR! 🤯\n\n'
-                'Bypassing it using sub-₹2,000 smart tranche splitting. 🚀\n#UPI #Fintech #SplitPe',
-              );
-              final url = 'https://twitter.com/intent/tweet?text=$tweetText';
-              final uri = Uri.parse(url);
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            },
-            icon: const Icon(Icons.share_rounded, color: Colors.black, size: 18),
-            label: const Text('Tweet My Business Savings 🔥'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryGreen,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Developer SDK teaser
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'DEVELOPER SDK',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.neonCyan,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        await UpiService.copyToClipboard('npm install @splitpe/sdk');
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('SDK install command copied!')),
-                          );
-                        }
-                      },
-                      child: const Text(
-                        'Copy 📋',
-                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                      ),
-                    ),
-                  ],
+                const Text(
+                  'ROAST OF THE DAY 🎙️',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.1,
+                    color: AppColors.goldenYellow,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                const SelectableText(
-                  'npm install @splitpe/sdk\n\nconst split = await splitpe.createOrder({\n  amount: 8500,\n  maxTranche: 1999\n});',
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 12,
-                    color: AppColors.primaryGreen,
+                Text(
+                  _roastCommentary,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    height: 1.4,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 40),
+          const SizedBox(height: 16),
+
+          // Viral Clout Share Button
+          NeoPopActionButton(
+            text: 'TWEET THIS MDR ROAST ON X 🔥',
+            color: Colors.white,
+            textColor: Colors.black,
+            prefixIcon: const Icon(Icons.send_rounded, color: Colors.black, size: 16),
+            onTap: () {
+              final tweet = '🚨 I calculated how much the new 0.4% UPI MDR is costing my business:\n\n'
+                  '💸 Lost: ${_currencyFormat.format(_annualMdrLoss)}/year to payment gateways!\n'
+                  '🛡️ Saved with @SplitPe via sub-₹2,000 smart tranche routing.\n\n'
+                  '#Fintech #UPI #SplitPe #MDR';
+              final url = Uri.parse('https://twitter.com/intent/tweet?text=${Uri.encodeComponent(tweet)}');
+              launchUrl(url, mode: LaunchMode.externalApplication);
+            },
+          ),
         ],
       ),
     );

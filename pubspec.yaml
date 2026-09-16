@@ -41,6 +41,7 @@ dependencies:
   intl: ^0.20.3
   share_plus: ^13.3.0
   mobile_scanner: ^7.4.2
+  neopop: ^1.0.2
 
 dev_dependencies:
   flutter_test:

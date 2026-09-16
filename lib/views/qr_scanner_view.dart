@@ -60,7 +60,10 @@ class _QrScannerViewState extends State<QrScannerView>
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Paste UPI Link / VPA', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'Paste UPI Link / VPA',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         content: TextField(
           controller: textController,
           style: const TextStyle(color: AppColors.textPrimary),
@@ -73,14 +76,20 @@ class _QrScannerViewState extends State<QrScannerView>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
               _handleQrResult(textController.text);
             },
-            child: const Text('Use QR Data', style: TextStyle(color: Colors.black)),
+            child: const Text(
+              'Use QR Data',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ],
       ),
@@ -98,7 +107,9 @@ class _QrScannerViewState extends State<QrScannerView>
           IconButton(
             icon: Icon(
               _isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
-              color: _isTorchOn ? AppColors.goldenYellow : AppColors.textSecondary,
+              color: _isTorchOn
+                  ? AppColors.goldenYellow
+                  : AppColors.textSecondary,
             ),
             onPressed: () async {
               await _scannerController.toggleTorch();
@@ -108,7 +119,10 @@ class _QrScannerViewState extends State<QrScannerView>
             },
           ),
           IconButton(
-            icon: const Icon(Icons.flip_camera_ios_rounded, color: AppColors.textSecondary),
+            icon: const Icon(
+              Icons.flip_camera_ios_rounded,
+              color: AppColors.textSecondary,
+            ),
             onPressed: () => _scannerController.switchCamera(),
           ),
         ],
@@ -127,7 +141,11 @@ class _QrScannerViewState extends State<QrScannerView>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.camera_alt_outlined, size: 48, color: AppColors.textSecondary),
+                      const Icon(
+                        Icons.camera_alt_outlined,
+                        size: 48,
+                        color: AppColors.textSecondary,
+                      ),
                       const SizedBox(height: 12),
                       const Text(
                         'Camera unavailable on this device/platform.',
@@ -137,7 +155,11 @@ class _QrScannerViewState extends State<QrScannerView>
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
                         onPressed: _showManualEntryDialog,
-                        icon: const Icon(Icons.paste_rounded, color: Colors.black, size: 16),
+                        icon: const Icon(
+                          Icons.paste_rounded,
+                          color: Colors.black,
+                          size: 16,
+                        ),
                         label: const Text('Paste UPI Link / Demo Data'),
                       ),
                     ],
@@ -193,7 +215,10 @@ class _QrScannerViewState extends State<QrScannerView>
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withAlpha(200),
                     borderRadius: BorderRadius.circular(16),
@@ -201,7 +226,10 @@ class _QrScannerViewState extends State<QrScannerView>
                   ),
                   child: const Text(
                     'Point camera at any BharatPe, PhonePe, Paytm or Google Pay QR code',
-                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -252,7 +280,11 @@ class _QrScannerViewState extends State<QrScannerView>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.qr_code_2_rounded, size: 14, color: AppColors.primaryGreen),
+            const Icon(
+              Icons.qr_code_2_rounded,
+              size: 14,
+              color: AppColors.primaryGreen,
+            ),
             const SizedBox(width: 6),
             Text(
               label,

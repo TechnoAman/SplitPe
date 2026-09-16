@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:neopop/neopop.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
 import '../services/split_engine.dart';
 import '../theme/app_theme.dart';
+import '../widgets/neopop_components.dart';
 import '../widgets/qr_tranche_card.dart';
 
 class GroupSplitView extends StatefulWidget {
@@ -16,7 +18,7 @@ class GroupSplitView extends StatefulWidget {
 class _GroupSplitViewState extends State<GroupSplitView> {
   final _amountController = TextEditingController(text: '6800');
   int _peopleCount = 4;
-  final List<String> _friendNames = ['You', 'Rohit', 'Sneha', 'Vikram'];
+  final List<String> _friendNames = ['You', 'Rohit', 'Sneha', 'Vikram', 'Pooja', 'Ananya', 'Aarav'];
   SplitOrder? _groupOrder;
 
   @override
@@ -61,30 +63,28 @@ class _GroupSplitViewState extends State<GroupSplitView> {
     final order = _groupOrder;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header Card
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.cardBorder),
-            ),
+          // CRED NeoPOP Header Card
+          NeoPopSurfaceCard(
+            backgroundColor: const Color(0xFF101012),
+            borderColor: AppColors.neoBorder,
+            depth: 4.0,
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.group_rounded, color: AppColors.neonCyan, size: 20),
+                    Icon(Icons.groups_rounded, color: AppColors.neonCyan, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'GROUP BILL SPLIT (ZERO MDR)',
                       style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
                         letterSpacing: 1.1,
                         color: AppColors.neonCyan,
                       ),
@@ -117,63 +117,84 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: '0.00',
+                          hintStyle: TextStyle(color: AppColors.textMuted),
                         ),
-                        onChanged: (_) => _recalculateGroup(),
+                        onSubmitted: (_) => _recalculateGroup(),
                       ),
                     ),
                   ],
                 ),
 
-                const Divider(color: AppColors.cardBorder, height: 24),
+                const SizedBox(height: 14),
 
-                // People selector
+                // People Count Selector
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Number of Friends',
+                      'NUMBER OF PEOPLE:',
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Row(
                       children: [
-                        IconButton(
-                          onPressed: _peopleCount > 2
-                              ? () {
-                                  setState(() {
-                                    _peopleCount--;
-                                    _recalculateGroup();
-                                  });
-                                }
-                              : null,
-                          icon: const Icon(Icons.remove_circle_outline_rounded),
-                          color: AppColors.textSecondary,
-                        ),
-                        Text(
-                          '$_peopleCount',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primaryGreen,
+                        NeoPopButton(
+                          color: const Color(0xFF1E1E22),
+                          bottomShadowColor: Colors.black,
+                          rightShadowColor: Colors.black,
+                          depth: 2.0,
+                          border: Border.all(color: AppColors.cardBorder, width: 1.2),
+                          onTapUp: () {
+                            if (_peopleCount > 2) {
+                              setState(() {
+                                _peopleCount--;
+                                _recalculateGroup();
+                              });
+                            }
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(Icons.remove, size: 16, color: AppColors.textPrimary),
                           ),
                         ),
-                        IconButton(
-                          onPressed: _peopleCount < 8
-                              ? () {
-                                  setState(() {
-                                    _peopleCount++;
-                                    if (_friendNames.length < _peopleCount) {
-                                      _friendNames.add('Friend #$_peopleCount');
-                                    }
-                                    _recalculateGroup();
-                                  });
-                                }
-                              : null,
-                          icon: const Icon(Icons.add_circle_outline_rounded),
-                          color: AppColors.primaryGreen,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF18181B),
+                            border: Border.all(color: AppColors.neoBorder, width: 1.2),
+                          ),
+                          child: Text(
+                            '$_peopleCount',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.neonCyan,
+                            ),
+                          ),
+                        ),
+                        NeoPopButton(
+                          color: const Color(0xFF1E1E22),
+                          bottomShadowColor: Colors.black,
+                          rightShadowColor: Colors.black,
+                          depth: 2.0,
+                          border: Border.all(color: AppColors.cardBorder, width: 1.2),
+                          onTapUp: () {
+                            if (_peopleCount < 8) {
+                              setState(() {
+                                _peopleCount++;
+                                _recalculateGroup();
+                              });
+                            }
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(Icons.add, size: 16, color: AppColors.textPrimary),
+                          ),
                         ),
                       ],
                     ),
@@ -183,34 +204,30 @@ class _GroupSplitViewState extends State<GroupSplitView> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Share group link button
-          ElevatedButton.icon(
-            onPressed: _shareAllViaWhatsApp,
-            icon: const Icon(Icons.send_rounded, color: Colors.black, size: 18),
-            label: const Text('Share Split Link on WhatsApp 💬'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.neonCyan,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
+          // Quick Share WhatsApp Button
+          NeoPopActionButton(
+            text: 'SHARE SPLIT LINKS ON WHATSAPP 💬',
+            color: AppColors.neonCyan,
+            textColor: Colors.black,
+            prefixIcon: const Icon(Icons.share_rounded, color: Colors.black, size: 16),
+            onTap: _shareAllViaWhatsApp,
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
-          // Individual Friend Tranches
           if (order != null) ...[
             Text(
               'INDIVIDUAL SHARES (${order.tranches.length})',
               style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.1,
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
             ListView.builder(
               shrinkWrap: true,
@@ -221,17 +238,17 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                 return QrTrancheCard(
                   tranche: tranche,
                   totalTranches: order.tranches.length,
-                  isCurrentActive: !tranche.isPaid,
+                  isCurrentActive: !tranche.isPaid && index == 0,
                   onSimulatePayment: () {
                     setState(() {
                       tranche.status = TrancheStatus.paid;
+                      tranche.paidAt = DateTime.now();
                     });
                   },
                 );
               },
             ),
           ],
-          const SizedBox(height: 40),
         ],
       ),
     );

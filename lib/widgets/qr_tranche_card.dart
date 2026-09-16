@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:neopop/neopop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/tranche.dart';
 import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
+import 'neopop_components.dart';
 
 class QrTrancheCard extends StatelessWidget {
   final Tranche tranche;
@@ -22,35 +24,31 @@ class QrTrancheCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPaid = tranche.isPaid;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isPaid
-            ? AppColors.surface.withAlpha(160)
-            : isCurrentActive
-                ? AppColors.surfaceElevated
-                : AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: isPaid ? const Color(0xFF0F1713) : const Color(0xFF141416),
         border: Border.all(
           color: isPaid
-              ? AppColors.primaryGreen.withAlpha(100)
+              ? AppColors.primaryGreen
               : isCurrentActive
-                  ? AppColors.primaryGreen
+                  ? AppColors.neonCyan
                   : AppColors.cardBorder,
-          width: isCurrentActive ? 2 : 1,
+          width: isCurrentActive || isPaid ? 2.0 : 1.5,
         ),
-        boxShadow: isCurrentActive
-            ? [
-                BoxShadow(
-                  color: AppColors.primaryGreen.withAlpha(40),
-                  blurRadius: 16,
-                  spreadRadius: 1,
-                )
-              ]
-            : [],
+        boxShadow: [
+          BoxShadow(
+            color: isPaid
+                ? AppColors.primaryGreen.withAlpha(160)
+                : isCurrentActive
+                    ? AppColors.neonCyan.withAlpha(160)
+                    : const Color(0xFF000000),
+            offset: const Offset(4, 4),
+            blurRadius: 0,
+          ),
+        ],
       ),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,26 +58,14 @@ class QrTrancheCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isPaid
-                          ? AppColors.primaryGreen.withAlpha(30)
-                          : AppColors.surface,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isPaid ? AppColors.primaryGreen : AppColors.cardBorder,
-                      ),
-                    ),
-                    child: Text(
-                      'TRANCHE ${tranche.index}/$totalTranches',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: isPaid ? AppColors.primaryGreen : AppColors.textSecondary,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
+                  NeoPopPillBadge(
+                    label: 'TRANCHE ${tranche.index}/$totalTranches',
+                    color: isPaid
+                        ? AppColors.primaryGreen
+                        : isCurrentActive
+                            ? AppColors.neonCyan
+                            : const Color(0xFF27272A),
+                    textColor: isPaid || isCurrentActive ? Colors.black : Colors.white,
                   ),
                   if (tranche.payerName != null) ...[
                     const SizedBox(width: 8),
@@ -87,7 +73,7 @@ class QrTrancheCard extends StatelessWidget {
                       tranche.payerName!,
                       style: const TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -95,41 +81,130 @@ class QrTrancheCard extends StatelessWidget {
                 ],
               ),
               // Status Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isPaid
-                      ? AppColors.primaryGreen
-                      : isCurrentActive
-                          ? AppColors.neonCyan.withAlpha(30)
-                          : AppColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(12),
+              if (isPaid)
+                const NeoPopPillBadge(
+                  label: '✓ PAID',
+                  color: AppColors.primaryGreen,
+                  textColor: Colors.black,
+                  icon: Icon(Icons.check, size: 10, color: Colors.black),
+                )
+              else if (isCurrentActive)
+                const NeoPopPillBadge(
+                  label: 'PAY NOW',
+                  color: AppColors.goldenYellow,
+                  textColor: Colors.black,
+                )
+              else
+                const NeoPopPillBadge(
+                  label: 'PENDING',
+                  color: Color(0xFF27272A),
+                  textColor: AppColors.textMuted,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      isPaid
-                          ? Icons.check_circle_rounded
-                          : isCurrentActive
-                              ? Icons.play_arrow_rounded
-                              : Icons.hourglass_top_rounded,
-                      size: 14,
-                      color: isPaid ? Colors.black : (isCurrentActive ? AppColors.neonCyan : AppColors.textMuted),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          // Main Body: QR Code & Amount Details
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // High-contrast NeoPOP QR Frame
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.black, width: 2),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0xFF000000),
+                      offset: Offset(3, 3),
+                      blurRadius: 0,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      isPaid
-                          ? 'PAID'
-                          : isCurrentActive
-                              ? 'ACTIVE'
-                              : 'QUEUED',
+                  ],
+                ),
+                child: Opacity(
+                  opacity: isPaid ? 0.3 : 1.0,
+                  child: QrImageView(
+                    data: tranche.upiUri,
+                    version: QrVersions.auto,
+                    size: 96.0,
+                    backgroundColor: Colors.white,
+                    eyeStyle: const QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: Colors.black,
+                    ),
+                    dataModuleStyle: const QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 14),
+
+              // Tranche Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'AMOUNT DUE',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        color: isPaid ? Colors.black : (isCurrentActive ? AppColors.neonCyan : AppColors.textMuted),
+                        letterSpacing: 1.0,
+                        color: AppColors.textSecondary,
                       ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '₹${tranche.amount.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: isPaid ? AppColors.primaryGreen : AppColors.textPrimary,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+
+                    // Zero MDR Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen.withAlpha(20),
+                        border: Border.all(color: AppColors.primaryGreen.withAlpha(80)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bolt, size: 12, color: AppColors.primaryGreen),
+                          SizedBox(width: 3),
+                          Text(
+                            '0% MDR Arbitrage',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    if (isPaid && tranche.txnRef != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        'Ref: ${tranche.txnRef}',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.textMuted,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -138,166 +213,114 @@ class QrTrancheCard extends StatelessWidget {
 
           const SizedBox(height: 14),
 
-          // Middle: Amount & QR / Action
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // QR Code Box (Tap to zoom / copy)
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(60),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: QrImageView(
-                  data: tranche.upiUri,
-                  version: QrVersions.auto,
-                  size: 90,
-                  backgroundColor: Colors.white,
-                  padding: EdgeInsets.zero,
-                ),
-              ),
-
-              const SizedBox(width: 16),
-
-              // Details & Action
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '₹${tranche.amount.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: isPaid ? AppColors.primaryGreen : AppColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.verified_rounded,
-                          color: AppColors.primaryGreen,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Zero MDR (≤ ₹2,000)',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryGreen.withAlpha(220),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Actions Row
-                    if (!isPaid) ...[
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          // UPI Intent Button
-                          InkWell(
-                            onTap: () async {
-                              final launched = await UpiService.launchUpiIntent(tranche.upiUri);
-                              if (!launched && context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('UPI URI copied to clipboard! (UPI app not detected on this device)'),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                                await UpiService.copyToClipboard(tranche.upiUri);
-                              }
-                            },
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.neonCyan.withAlpha(30),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.neonCyan.withAlpha(100)),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.launch_rounded, size: 13, color: AppColors.neonCyan),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Open UPI App',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.neonCyan,
-                                    ),
-                                  ),
-                                ],
-                              ),
+          // Action Buttons
+          if (!isPaid) ...[
+            Row(
+              children: [
+                // 1. CRED NeoPop Intent Trigger
+                Expanded(
+                  flex: 3,
+                  child: NeoPopButton(
+                    color: isCurrentActive ? AppColors.primaryGreen : AppColors.neonCyan,
+                    bottomShadowColor: const Color(0xFF000000),
+                    rightShadowColor: const Color(0xFF000000),
+                    depth: 3.0,
+                    border: Border.all(color: Colors.black, width: 1.5),
+                    onTapUp: () async {
+                      final launched = await UpiService.launchUpiIntent(tranche.upiUri);
+                      if (!launched) {
+                        await UpiService.copyToClipboard(tranche.upiUri);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('⚡ Copied UPI Payment Link to Clipboard!'),
+                              backgroundColor: AppColors.surfaceElevated,
+                              duration: Duration(seconds: 2),
                             ),
-                          ),
-
-                          // Fast Simulate Pay Button
-                          InkWell(
-                            onTap: onSimulatePayment,
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryGreen.withAlpha(30),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.primaryGreen.withAlpha(100)),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.bolt_rounded, size: 14, color: AppColors.primaryGreen),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    'Simulate Pay',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primaryGreen,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ] else ...[
-                      Row(
+                          );
+                        }
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.done_all_rounded, size: 16, color: AppColors.primaryGreen),
-                          const SizedBox(width: 4),
+                          const Icon(Icons.rocket_launch_rounded, color: Colors.black, size: 14),
+                          const SizedBox(width: 6),
                           Text(
-                            'Settled via SplitPe Engine',
-                            style: TextStyle(
+                            'Pay Tranche #${tranche.index}',
+                            style: const TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.black,
                             ),
                           ),
                         ],
                       ),
-                    ],
-                  ],
+                    ),
+                  ),
                 ),
+
+                const SizedBox(width: 8),
+
+                // 2. Simulate Pay Demo Button
+                Expanded(
+                  flex: 2,
+                  child: NeoPopButton(
+                    color: const Color(0xFF27272A),
+                    bottomShadowColor: const Color(0xFF000000),
+                    rightShadowColor: const Color(0xFF000000),
+                    depth: 3.0,
+                    border: Border.all(color: AppColors.cardBorder, width: 1.5),
+                    onTapUp: onSimulatePayment,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_outline, color: AppColors.textSecondary, size: 14),
+                          SizedBox(width: 4),
+                          Text(
+                            'Simulate',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen.withAlpha(25),
+                border: Border.all(color: AppColors.primaryGreen.withAlpha(100)),
               ),
-            ],
-          ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.verified, size: 14, color: AppColors.primaryGreen),
+                  SizedBox(width: 6),
+                  Text(
+                    'Tranche Cleared · ₹0 MDR Incurred',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryGreen,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );

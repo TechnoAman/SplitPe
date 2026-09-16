@@ -296,6 +296,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.4.2"
+  neopop:
+    dependency: "direct main"
+    description:
+      name: neopop
+      sha256: f009b36e803cba5df533a92b567bbd184698fb6b14aca6bcdfb7241da9afb370
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   objective_c:
     dependency: transitive
     description:

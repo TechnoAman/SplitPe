@@ -168,7 +168,7 @@ class CloutShareModal extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF16251C),
+                      color: AppColors.blueSurface,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: AppColors.primaryGreen.withAlpha(60)),
                     ),

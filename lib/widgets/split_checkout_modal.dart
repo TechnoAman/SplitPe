@@ -316,7 +316,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF16251C),
+                          color: AppColors.blueSurface,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.primaryGreen.withAlpha(80)),
                         ),

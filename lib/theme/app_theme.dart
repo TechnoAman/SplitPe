@@ -11,16 +11,19 @@ class AppColors {
   static const Color neoBorder = Color(0xFF383B46);
   static const Color hardShadow = Color(0xFF000000);
 
-  // CRED High-Contrast Neon Highlights
-  static const Color primaryGreen = Color(0xFF00E676); // High-voltage emerald
-  static const Color greenDark = Color(0xFF00A859);
+  // Google Play & GPay Electric Blue Palette
+  static const Color primaryBlue = Color(0xFF0084FF); // Electric Google Blue
+  static const Color primaryBlueDark = Color(0xFF1A73E8); // Classic Google Material Blue
+  static const Color primaryGreen = primaryBlue; // Seamless alias for whole-app blue theme
+  static const Color greenDark = primaryBlueDark;
+  static const Color blueSurface = Color(0xFF0E1E38); // Midnight blue container tint
   static const Color neonCyan = Color(0xFF00E5FF);
-  static const Color electricPurple = Color(0xFFD500F9);
+  static const Color electricPurple = Color(0xFF7C4DFF);
   static const Color goldenYellow = Color(0xFFFFD600);
   static const Color alertRed = Color(0xFFFF1744);
   static const Color pureWhite = Color(0xFFFFFFFF);
 
-  // CRED Typographic Hierarchy
+  // CRED & Google Typographic Hierarchy
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xFF8A8F9E);
   static const Color textMuted = Color(0xFF555A68);
@@ -31,9 +34,9 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.background,
-      primaryColor: AppColors.primaryGreen,
+      primaryColor: AppColors.primaryBlue,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryGreen,
+        primary: AppColors.primaryBlue,
         secondary: AppColors.neonCyan,
         surface: AppColors.surface,
         error: AppColors.alertRed,

@@ -29,7 +29,7 @@ class SplitPeLogo extends StatelessWidget {
             border: Border.all(color: AppColors.primaryGreen, width: 1.2),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x6600E676),
+                color: Color(0x660084FF),
                 offset: Offset(2.0, 2.0),
                 blurRadius: 0,
               ),
@@ -46,7 +46,7 @@ class SplitPeLogo extends StatelessWidget {
                   style: TextStyle(
                     fontSize: size * 0.65,
                     fontWeight: FontWeight.w900,
-                    color: AppColors.primaryGreen,
+                    color: AppColors.primaryBlue,
                   ),
                 ),
               );
@@ -72,7 +72,7 @@ class SplitPeLogo extends StatelessWidget {
               Text(
                 'PE',
                 style: TextStyle(
-                  color: AppColors.primaryGreen,
+                  color: AppColors.primaryBlue,
                   fontWeight: FontWeight.w900,
                   fontSize: size * 0.68,
                   letterSpacing: 0.5,
@@ -85,8 +85,8 @@ class SplitPeLogo extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF16281D),
-                border: Border.all(color: AppColors.primaryGreen, width: 1.0),
+                color: AppColors.blueSurface,
+                border: Border.all(color: AppColors.primaryBlue, width: 1.0),
               ),
               child: const Text(
                 '0% MDR',

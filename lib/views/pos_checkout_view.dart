@@ -614,91 +614,91 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                       isDense: true,
                                       contentPadding: EdgeInsets.zero,
                                       hintText: '0',
-                                  hintStyle: TextStyle(
-                                    color: Color(0xFF383B46),
+                                      hintStyle: TextStyle(
+                                        color: Color(0xFF383B46),
+                                      ),
+                                    ),
+                                    onChanged: (_) {
+                                      _selectedPresetTitle = 'CUSTOM BILL';
+                                      _recalculateOrder();
+                                    },
                                   ),
                                 ),
-                                onChanged: (_) {
-                                  _selectedPresetTitle = 'CUSTOM BILL';
-                                  _recalculateOrder();
-                                },
+                              ],
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // CRED NeoPOP Preset Buttons
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: _kiranaPresets.map((preset) {
+                                  final isSelected =
+                                      _amountController.text ==
+                                      preset.amount.toStringAsFixed(0);
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: NeoPopButton(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : AppColors.surfaceElevated,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : AppColors.neoBorder,
+                                        width: 1.2,
+                                      ),
+                                      depth: 2,
+                                      onTapUp: () {
+                                        _amountController.text = preset.amount
+                                            .toStringAsFixed(0);
+                                        _selectedPresetTitle = preset.title;
+                                        _recalculateOrder();
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 8,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              preset.title,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w900,
+                                                letterSpacing: 0.5,
+                                                color: isSelected
+                                                    ? Colors.black
+                                                    : Colors.white,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              '₹${preset.amount.toStringAsFixed(0)}',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w900,
+                                                color: isSelected
+                                                    ? Colors.black
+                                                    : AppColors.primaryGreen,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ),
                           ],
                         ),
-
-                        const SizedBox(height: 14),
-
-                        // CRED NeoPOP Preset Buttons
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _kiranaPresets.map((preset) {
-                              final isSelected =
-                                  _amountController.text ==
-                                  preset.amount.toStringAsFixed(0);
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: NeoPopButton(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : AppColors.surfaceElevated,
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : AppColors.neoBorder,
-                                    width: 1.2,
-                                  ),
-                                  depth: 2,
-                                  onTapUp: () {
-                                    _amountController.text = preset.amount
-                                        .toStringAsFixed(0);
-                                    _selectedPresetTitle = preset.title;
-                                    _recalculateOrder();
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 8,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          preset.title,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w900,
-                                            letterSpacing: 0.5,
-                                            color: isSelected
-                                                ? Colors.black
-                                                : Colors.white,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          '₹${preset.amount.toStringAsFixed(0)}',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w900,
-                                            color: isSelected
-                                                ? Colors.black
-                                                : AppColors.primaryGreen,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
                 const SizedBox(height: 14),
 
@@ -814,7 +814,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             horizontal: 10,
                             vertical: 8,
                           ),
-                          color: const Color(0xFF16281D),
+                          color: AppColors.blueSurface,
                           child: Row(
                             children: [
                               Container(
@@ -823,10 +823,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                    color: AppColors.primaryGreen.withAlpha(120),
+                                    color: AppColors.primaryGreen.withAlpha(
+                                      120,
+                                    ),
                                   ),
                                   image: const DecorationImage(
-                                    image: AssetImage('assets/images/gandhi_currency.png'),
+                                    image: AssetImage(
+                                      'assets/images/gandhi_currency.png',
+                                    ),
                                     fit: BoxFit.cover,
                                   ),
                                 ),

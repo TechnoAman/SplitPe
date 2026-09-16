@@ -3,9 +3,7 @@
     {
       "name": "Default",
       "files": [
-        "lib/services/split_engine.dart",
-        "lib/views/pos_checkout_view.dart",
-        "test/widget_test.dart"
+        "lib/views/pos_checkout_view.dart"
       ]
     }
   ],

@@ -3,7 +3,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/split_order.dart';
 import '../theme/app_theme.dart';
-import 'neopop_components.dart';
 
 class CloutShareModal extends StatelessWidget {
   final SplitOrder order;
@@ -11,10 +10,10 @@ class CloutShareModal extends StatelessWidget {
   const CloutShareModal({super.key, required this.order});
 
   static void show(BuildContext context, SplitOrder order) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(200),
       builder: (ctx) => CloutShareModal(order: order),
     );
   }
@@ -22,61 +21,84 @@ class CloutShareModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tweetText = Uri.encodeComponent(
-      '🔥 Just bypassed the new 0.4% UPI MDR on a ₹${order.totalAmount.toStringAsFixed(0)} bill using @SplitPe!\n\n'
+      '🔥 Just settled a ₹${order.totalAmount.toStringAsFixed(0)} bill with ₹0 MDR using @SplitPe!\n\n'
       '⚡ Split into ${order.tranches.length} sub-₹2,000 tranches.\n'
-      '💰 Net MDR Paid: ₹0.00 (Saved ₹${order.mdrSavings.toStringAsFixed(2)})\n\n'
-      'Peak Indian Jugaad 🇮🇳🚀 #UPI #Fintech #SplitPe #ZeroMDR',
+      '💰 Net MDR Surcharge Paid: ₹0.00 (Saved ₹${order.mdrSavings.toStringAsFixed(2)})\n\n'
+      '100% Compliant #UPI #Fintech #SplitPe #ZeroMDR',
     );
 
     final twitterUrl = 'https://twitter.com/intent/tweet?text=$tweetText';
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFF0A0A0C),
-        border: Border(
-          top: BorderSide(color: AppColors.primaryGreen, width: 2.0),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxWidth: 380),
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          color: const Color(0xFF141417),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFF27272A), width: 1.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(160),
+              blurRadius: 30,
+              offset: const Offset(0, 15),
+            ),
+          ],
         ),
-      ),
-      child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Drag handle
-            Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(0xFF27272A),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Header
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            // Header Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                NeoPopPillBadge(
-                  label: 'ZERO-MDR VERIFIED RECEIPT',
-                  color: AppColors.primaryGreen,
-                  textColor: Colors.black,
-                  icon: Icon(Icons.verified_rounded, color: Colors.black, size: 14),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF1B2E24),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check_rounded, color: AppColors.primaryGreen, size: 14),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Zero-MDR Receipt',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
 
-            // The CRED NeoPOP Receipt Card
-            NeoPopSurfaceCard(
-              backgroundColor: const Color(0xFF141416),
-              borderColor: AppColors.primaryGreen,
-              shadowColor: AppColors.primaryGreen.withAlpha(120),
-              depth: 4.0,
-              padding: const EdgeInsets.all(18),
+            const SizedBox(height: 18),
+
+            // Receipt Container
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1A1E),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF2E2E34)),
+              ),
               child: Column(
                 children: [
-                  // Merchant & Time
+                  // Merchant & VPA
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -85,72 +107,70 @@ class CloutShareModal extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              order.merchantName.toUpperCase(),
+                              order.merchantName,
                               style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.textPrimary,
-                                letterSpacing: 0.8,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               order.merchantVpa,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textMuted,
-                              ),
+                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                      const NeoPopPillBadge(
-                        label: '100% SETTLED',
-                        color: Color(0xFF1E1E22),
-                        textColor: AppColors.primaryGreen,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1B2E24),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          '100% Settled',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 14),
-                  const Divider(color: Color(0xFF27272A), thickness: 1),
+                  const Divider(color: Color(0xFF28282E), height: 1),
                   const SizedBox(height: 14),
 
-                  // Big Amount Paid
+                  // Amount Settled
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'TOTAL SETTLED',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.0,
-                          color: AppColors.textSecondary,
-                        ),
+                        'Total Settled',
+                        style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
                       ),
                       Text(
                         '₹${order.totalAmount.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 10),
 
-                  // MDR Surcharge Avoided (Hero Metric)
+                  // MDR Saved Highlight
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryGreen.withAlpha(20),
-                      border: Border.all(color: AppColors.primaryGreen.withAlpha(100)),
+                      color: const Color(0xFF16251C),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.primaryGreen.withAlpha(60)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -160,40 +180,31 @@ class CloutShareModal extends StatelessWidget {
                             Icon(Icons.bolt, color: AppColors.primaryGreen, size: 16),
                             SizedBox(width: 6),
                             Text(
-                              'MDR Surcharge Avoided',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primaryGreen,
-                              ),
+                              'MDR Surcharge Saved',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
                             ),
                           ],
                         ),
                         Text(
                           '+₹${order.mdrSavings.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primaryGreen,
-                          ),
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
-                  // Tranches list summary
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Split into ${order.tranches.length} sub-₹2,000 tranches',
+                        '${order.tranches.length} sub-₹2,000 tranches',
                         style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
                       ),
                       const Text(
                         '0% MDR Certified',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.neonCyan),
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
                       ),
                     ],
                   ),
@@ -201,35 +212,59 @@ class CloutShareModal extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
 
-            // Share CTA Buttons
+            // Share Buttons (Responsive, no overflow)
             Row(
               children: [
                 Expanded(
-                  child: NeoPopActionButton(
-                    text: 'POST ON X 🔥',
-                    color: Colors.white,
-                    textColor: Colors.black,
-                    prefixIcon: const Icon(Icons.send_rounded, color: Colors.black, size: 14),
-                    onTap: () {
-                      launchUrl(Uri.parse(twitterUrl), mode: LaunchMode.externalApplication);
-                    },
+                  child: SizedBox(
+                    height: 44,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        launchUrl(Uri.parse(twitterUrl), mode: LaunchMode.externalApplication);
+                      },
+                      icon: const Icon(Icons.send_rounded, size: 14, color: Colors.black),
+                      label: const Text(
+                        'Post on X',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: NeoPopActionButton(
-                    text: 'WHATSAPP 💬',
-                    color: AppColors.primaryGreen,
-                    textColor: Colors.black,
-                    prefixIcon: const Icon(Icons.share_rounded, color: Colors.black, size: 14),
-                    onTap: () {
-                      final msg = '⚡ Just settled a ₹${order.totalAmount.toStringAsFixed(0)} bill with ₹0 MDR using SplitPe!\n'
-                          'Saved ₹${order.mdrSavings.toStringAsFixed(2)} in gateway fees.\n'
-                          'Check out SplitPe!';
-                      SharePlus.instance.share(ShareParams(text: msg));
-                    },
+                  child: SizedBox(
+                    height: 44,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        final msg = '⚡ Just settled a ₹${order.totalAmount.toStringAsFixed(0)} bill with ₹0 MDR using SplitPe!\n'
+                            'Saved ₹${order.mdrSavings.toStringAsFixed(2)} in gateway fees.\n'
+                            'Check out SplitPe!';
+                        SharePlus.instance.share(ShareParams(text: msg));
+                      },
+                      icon: const Icon(Icons.share_rounded, size: 14, color: Colors.black),
+                      label: const Text(
+                        'WhatsApp',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryGreen,
+                        foregroundColor: Colors.black,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
                   ),
                 ),
               ],

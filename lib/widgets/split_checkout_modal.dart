@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import 'package:neopop/neopop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
 import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
 import 'clout_share_modal.dart';
-import 'neopop_components.dart';
 
-class SplitCheckoutModal extends StatefulWidget {
+class SplitCheckoutDialog extends StatefulWidget {
   final SplitOrder order;
   final Function(SplitOrder)? onOrderUpdated;
 
-  const SplitCheckoutModal({
+  const SplitCheckoutDialog({
     super.key,
     required this.order,
     this.onOrderUpdated,
@@ -24,11 +22,11 @@ class SplitCheckoutModal extends StatefulWidget {
     required SplitOrder order,
     Function(SplitOrder)? onOrderUpdated,
   }) {
-    return showModalBottomSheet(
+    return showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => SplitCheckoutModal(
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(200),
+      builder: (ctx) => SplitCheckoutDialog(
         order: order,
         onOrderUpdated: onOrderUpdated,
       ),
@@ -36,19 +34,17 @@ class SplitCheckoutModal extends StatefulWidget {
   }
 
   @override
-  State<SplitCheckoutModal> createState() => _SplitCheckoutModalState();
+  State<SplitCheckoutDialog> createState() => _SplitCheckoutDialogState();
 }
 
-class _SplitCheckoutModalState extends State<SplitCheckoutModal> {
+class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
   late ConfettiController _confettiController;
   int _activeStepIndex = 0;
-  bool _showAllTranches = false;
 
   @override
   void initState() {
     super.initState();
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
-    // Find the first unpaid tranche index
     final firstUnpaid = widget.order.tranches.indexWhere((t) => !t.isPaid);
     _activeStepIndex = firstUnpaid != -1 ? firstUnpaid : 0;
   }
@@ -72,7 +68,6 @@ class _SplitCheckoutModalState extends State<SplitCheckoutModal> {
       if (widget.order.isFullyPaid) {
         _confettiController.play();
       } else {
-        // Auto-advance to next unpaid step
         final nextUnpaid = widget.order.tranches.indexWhere((t) => !t.isPaid);
         if (nextUnpaid != -1) {
           _activeStepIndex = nextUnpaid;
@@ -83,178 +78,343 @@ class _SplitCheckoutModalState extends State<SplitCheckoutModal> {
     widget.onOrderUpdated?.call(widget.order);
   }
 
-  void _markAllAsPaid() {
-    setState(() {
-      for (var t in widget.order.tranches) {
-        t.status = TrancheStatus.paid;
-        t.paidAt = DateTime.now();
-        t.txnRef =
-            'TXN${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-      }
-      _confettiController.play();
-    });
-
-    widget.onOrderUpdated?.call(widget.order);
-  }
-
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
-    final remaining = order.totalAmount - order.paidAmount;
+    final isDone = order.isFullyPaid;
+    final totalSteps = order.tranches.length;
+    final currentTranche = _activeStepIndex < totalSteps
+        ? order.tranches[_activeStepIndex]
+        : order.tranches.last;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.90,
-      decoration: const BoxDecoration(
-        color: Color(0xFF0C0C0E),
-        border: Border(
-          top: BorderSide(color: AppColors.primaryGreen, width: 2.0),
-        ),
-      ),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Stack(
         alignment: Alignment.topCenter,
+        clipBehavior: Clip.none,
         children: [
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Modal Drag Handle & Close Bar
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 12, 18, 8),
-                  child: Row(
+          Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(maxWidth: 380),
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: const Color(0xFF141417),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFF27272A), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(160),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Header Row: Segment Bar & Close Button
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGreen,
-                              border: Border.all(color: Colors.black, width: 1.2),
-                            ),
-                            child: const Text(
-                              '0% MDR CHECKOUT',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF222228),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isDone ? 'COMPLETED' : 'TRANCHE ${_activeStepIndex + 1} OF $totalSteps',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textSecondary,
+                            letterSpacing: 0.5,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Saved ₹${order.mdrSavings.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              color: AppColors.primaryGreen,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                        icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
                     ],
                   ),
-                ),
 
-                const Divider(color: Color(0xFF1E1E22), height: 1),
+                  const SizedBox(height: 14),
 
-                // Payee Info Header Strip
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                  color: const Color(0xFF141416),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              order.merchantName,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
+                  if (!isDone) ...[
+                    // 1. Sleek Segment Progress Line
+                    Row(
+                      children: List.generate(totalSteps, (index) {
+                        final isPaid = order.tranches[index].isPaid;
+                        final isCurrent = index == _activeStepIndex;
+
+                        return Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _activeStepIndex = index;
+                              });
+                            },
+                            child: Container(
+                              height: 3.5,
+                              margin: EdgeInsets.only(right: index == totalSteps - 1 ? 0 : 5),
+                              decoration: BoxDecoration(
+                                color: isPaid
+                                    ? AppColors.primaryGreen
+                                    : isCurrent
+                                        ? Colors.white
+                                        : const Color(0xFF2E2E34),
+                                borderRadius: BorderRadius.circular(2),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
+                          ),
+                        );
+                      }),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    // 2. Payee Name & VPA
+                    Text(
+                      order.merchantName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      order.merchantVpa,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 3. Clean Centered QR Code
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(80),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Opacity(
+                        opacity: currentTranche.isPaid ? 0.3 : 1.0,
+                        child: QrImageView(
+                          data: currentTranche.upiUri,
+                          version: QrVersions.auto,
+                          size: 145.0,
+                          backgroundColor: Colors.white,
+                          eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square, color: Colors.black),
+                          dataModuleStyle: const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: Colors.black),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 4. Hero Amount
+                    Text(
+                      '₹${currentTranche.amount.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: -1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Total Bill: ₹${order.totalAmount.toStringAsFixed(0)} · 0% MDR',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // 5. Primary Action Button
+                    if (!currentTranche.isPaid) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final launched = await UpiService.launchUpiIntent(currentTranche.upiUri);
+                            if (!launched) {
+                              await UpiService.copyToClipboard(currentTranche.upiUri);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('⚡ Copied UPI Link to Clipboard!'),
+                                    backgroundColor: Color(0xFF1E1E22),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'Pay ₹${currentTranche.amount.toStringAsFixed(0)} via UPI',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: _markCurrentAsPaid,
+                        child: const Text(
+                          'Mark as Paid (Demo)',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF16251C),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.primaryGreen.withAlpha(80)),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check_circle_rounded, color: AppColors.primaryGreen, size: 16),
+                            SizedBox(width: 6),
                             Text(
-                              order.merchantVpa,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textMuted,
+                              'Tranche Paid',
+                              style: TextStyle(
+                                color: AppColors.primaryGreen,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'REMAINING',
-                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppColors.textSecondary),
-                          ),
-                          Text(
-                            '₹${remaining.toStringAsFixed(0)}',
+                      if (_activeStepIndex < totalSteps - 1) ...[
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _activeStepIndex++;
+                            });
+                          },
+                          child: const Text(
+                            'Next Tranche →',
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: remaining > 0 ? AppColors.goldenYellow : AppColors.primaryGreen,
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // Stepper Progress Bar
-                if (!order.isFullyPaid)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: _buildStepperBar(order),
-                  ),
-
-                const SizedBox(height: 12),
-
-                // Main Content Body
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      children: [
-                        if (order.isFullyPaid)
-                          _buildFullySettledView(order)
-                        else
-                          _buildFocusedTrancheView(order),
-
-                        const SizedBox(height: 16),
-
-                        // All Tranches Accordion
-                        _buildAllTranchesAccordion(order),
-
-                        const SizedBox(height: 20),
+                        ),
                       ],
+                    ],
+                  ] else ...[
+                    // Fully Settled View
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF16251C),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check_rounded, color: AppColors.primaryGreen, size: 36),
                     ),
-                  ),
-                ),
-              ],
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Bill Fully Settled',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '₹${order.totalAmount.toStringAsFixed(0)} settled across $totalSteps tranches with zero MDR fee.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          CloutShareModal.show(context, order);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: Colors.black,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Share Zero-MDR Receipt',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
 
-          // Confetti overlay on settlement
+          // Confetti explosion
           ConfettiWidget(
             confettiController: _confettiController,
             blastDirectionality: BlastDirectionality.explosive,
@@ -266,440 +426,6 @@ class _SplitCheckoutModalState extends State<SplitCheckoutModal> {
               Colors.white,
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStepperBar(SplitOrder order) {
-    final tranches = order.tranches;
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(tranches.length, (index) {
-          final tranche = tranches[index];
-          final isActive = index == _activeStepIndex;
-          final isPaid = tranche.isPaid;
-
-          return InkWell(
-            onTap: () {
-              setState(() {
-                _activeStepIndex = index;
-              });
-            },
-            child: Container(
-              margin: const EdgeInsets.only(right: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: isPaid
-                    ? const Color(0xFF0F1E15)
-                    : isActive
-                        ? AppColors.primaryGreen
-                        : const Color(0xFF161618),
-                border: Border.all(
-                  color: isPaid
-                      ? AppColors.primaryGreen
-                      : isActive
-                          ? Colors.black
-                          : AppColors.cardBorder,
-                  width: 1.2,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isPaid
-                        ? Icons.check_circle_rounded
-                        : isActive
-                            ? Icons.radio_button_checked_rounded
-                            : Icons.radio_button_off_rounded,
-                    size: 13,
-                    color: isPaid
-                        ? AppColors.primaryGreen
-                        : isActive
-                            ? Colors.black
-                            : AppColors.textMuted,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Step ${index + 1}',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      color: isPaid
-                          ? AppColors.primaryGreen
-                          : isActive
-                              ? Colors.black
-                              : AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildFocusedTrancheView(SplitOrder order) {
-    if (_activeStepIndex >= order.tranches.length) return const SizedBox.shrink();
-    final tranche = order.tranches[_activeStepIndex];
-    final isPaid = tranche.isPaid;
-
-    return NeoPopSurfaceCard(
-      backgroundColor: const Color(0xFF101012),
-      borderColor: isPaid ? AppColors.primaryGreen : AppColors.neonCyan,
-      shadowColor: isPaid ? AppColors.primaryGreen.withAlpha(120) : AppColors.neonCyan.withAlpha(120),
-      depth: 4.0,
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              NeoPopPillBadge(
-                label: 'PAYMENT ${_activeStepIndex + 1} OF ${order.tranches.length}',
-                color: isPaid ? AppColors.primaryGreen : AppColors.neonCyan,
-                textColor: Colors.black,
-              ),
-              NeoPopPillBadge(
-                label: isPaid ? '✓ SETTLED' : 'READY TO PAY',
-                color: isPaid ? AppColors.primaryGreen : AppColors.goldenYellow,
-                textColor: Colors.black,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 14),
-
-          // High Resolution QR Frame
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black, width: 2),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black,
-                  offset: Offset(4, 4),
-                  blurRadius: 0,
-                ),
-              ],
-            ),
-            child: Opacity(
-              opacity: isPaid ? 0.35 : 1.0,
-              child: QrImageView(
-                data: tranche.upiUri,
-                version: QrVersions.auto,
-                size: 150.0,
-                backgroundColor: Colors.white,
-                eyeStyle: const QrEyeStyle(eyeShape: QrEyeShape.square, color: Colors.black),
-                dataModuleStyle: const QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: Colors.black),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          Text(
-            '₹${tranche.amount.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w900,
-              color: isPaid ? AppColors.primaryGreen : Colors.white,
-              letterSpacing: -1.0,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            '≤ ₹2,000 Cap · 0% Surcharge Compliant',
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
-          ),
-
-          const SizedBox(height: 18),
-
-          if (!isPaid) ...[
-            NeoPopActionButton(
-              text: 'PAY ₹${tranche.amount.toStringAsFixed(0)} VIA UPI APP 🚀',
-              color: AppColors.primaryGreen,
-              textColor: Colors.black,
-              prefixIcon: const Icon(Icons.bolt, color: Colors.black, size: 18),
-              onTap: () async {
-                final launched = await UpiService.launchUpiIntent(tranche.upiUri);
-                if (!launched) {
-                  await UpiService.copyToClipboard(tranche.upiUri);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('⚡ Copied UPI Link to Clipboard!'),
-                        backgroundColor: AppColors.surfaceElevated,
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: NeoPopButton(
-                    color: const Color(0xFF1E1E22),
-                    bottomShadowColor: Colors.black,
-                    rightShadowColor: Colors.black,
-                    depth: 2.0,
-                    border: Border.all(color: AppColors.cardBorder, width: 1.2),
-                    onTapUp: _markCurrentAsPaid,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle_outline, size: 14, color: AppColors.textSecondary),
-                          SizedBox(width: 4),
-                          Text(
-                            'Mark Paid (Demo)',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: NeoPopButton(
-                    color: const Color(0xFF1E1E22),
-                    bottomShadowColor: Colors.black,
-                    rightShadowColor: Colors.black,
-                    depth: 2.0,
-                    border: Border.all(color: AppColors.cardBorder, width: 1.2),
-                    onTapUp: () {
-                      if (_activeStepIndex < order.tranches.length - 1) {
-                        setState(() {
-                          _activeStepIndex++;
-                        });
-                      }
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Text(
-                        'Next Step →',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.textSecondary),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ] else ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withAlpha(25),
-                border: Border.all(color: AppColors.primaryGreen, width: 1.5),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle_rounded, size: 16, color: AppColors.primaryGreen),
-                  SizedBox(width: 8),
-                  Text(
-                    'Tranche Settled · ₹0 MDR',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: AppColors.primaryGreen),
-                  ),
-                ],
-              ),
-            ),
-            if (_activeStepIndex < order.tranches.length - 1) ...[
-              const SizedBox(height: 10),
-              NeoPopActionButton(
-                text: 'PROCEED TO NEXT TRANCHE →',
-                color: AppColors.neonCyan,
-                textColor: Colors.black,
-                onTap: () {
-                  setState(() {
-                    _activeStepIndex++;
-                  });
-                },
-              ),
-            ],
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFullySettledView(SplitOrder order) {
-    return NeoPopSurfaceCard(
-      backgroundColor: const Color(0xFF0F1E15),
-      borderColor: AppColors.primaryGreen,
-      shadowColor: AppColors.primaryGreen.withAlpha(160),
-      depth: 4.0,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          const Icon(Icons.verified_rounded, color: AppColors.primaryGreen, size: 48),
-          const SizedBox(height: 10),
-          const Text(
-            'BILL 100% SETTLED',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Total ₹${order.totalAmount.toStringAsFixed(0)} cleared across ${order.tranches.length} tranches with zero MDR.',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 16),
-          NeoPopActionButton(
-            text: 'CLAIM ZERO-MDR RECEIPT 🔥',
-            color: AppColors.primaryGreen,
-            textColor: Colors.black,
-            prefixIcon: const Icon(Icons.share, color: Colors.black, size: 16),
-            onTap: () {
-              Navigator.pop(context);
-              CloutShareModal.show(context, order);
-            },
-          ),
-          const SizedBox(height: 10),
-          NeoPopActionButton(
-            text: 'DONE / CLOSE',
-            color: const Color(0xFF1E1E22),
-            textColor: Colors.white,
-            depth: 2.0,
-            onTap: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAllTranchesAccordion(SplitOrder order) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF141416),
-        border: Border.all(color: AppColors.neoBorder, width: 1.2),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      _showAllTranches = !_showAllTranches;
-                    });
-                  },
-                  child: Row(
-                    children: [
-                      const Icon(Icons.receipt_long_rounded, size: 16, color: AppColors.textSecondary),
-                      const SizedBox(width: 8),
-                      Text(
-                        'ALL TRANCHES (${order.tranches.length})',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.textSecondary),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        _showAllTranches ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        color: AppColors.textSecondary,
-                        size: 18,
-                      ),
-                    ],
-                  ),
-                ),
-                if (!order.isFullyPaid)
-                  NeoPopButton(
-                    color: AppColors.surfaceElevated,
-                    bottomShadowColor: Colors.black,
-                    rightShadowColor: Colors.black,
-                    depth: 1.5,
-                    border: Border.all(color: AppColors.cardBorder, width: 1.0),
-                    onTapUp: _markAllAsPaid,
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      child: Text(
-                        'Settle All (Demo)',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          if (_showAllTranches)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-              child: Column(
-                children: order.tranches.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final tranche = entry.value;
-                  final isSelected = index == _activeStepIndex;
-
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        _activeStepIndex = index;
-                      });
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFF1B1B1E)
-                            : tranche.isPaid
-                                ? const Color(0xFF0F1E15)
-                                : const Color(0xFF101012),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primaryGreen
-                              : tranche.isPaid
-                                  ? AppColors.primaryGreen.withAlpha(100)
-                                  : AppColors.cardBorder,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                tranche.isPaid ? Icons.check_circle : Icons.circle_outlined,
-                                size: 14,
-                                color: tranche.isPaid ? AppColors.primaryGreen : AppColors.textMuted,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Tranche #${tranche.index}',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            '₹${tranche.amount.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              color: tranche.isPaid ? AppColors.primaryGreen : Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
         ],
       ),
     );

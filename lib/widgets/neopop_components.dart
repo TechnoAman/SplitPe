@@ -64,9 +64,9 @@ class NeoPopActionButton extends StatelessWidget {
 /// CRED NeoPOP 3D Elevated Card
 class NeoPopSurfaceCard extends StatelessWidget {
   final Widget child;
-  final Color backgroundColor;
-  final Color borderColor;
-  final Color shadowColor;
+  final Color? backgroundColor;
+  final Color? borderColor;
+  final Color? shadowColor;
   final double depth;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
@@ -74,9 +74,9 @@ class NeoPopSurfaceCard extends StatelessWidget {
   const NeoPopSurfaceCard({
     super.key,
     required this.child,
-    this.backgroundColor = AppColors.surface,
-    this.borderColor = AppColors.neoBorder,
-    this.shadowColor = const Color(0xFF000000),
+    this.backgroundColor,
+    this.borderColor,
+    this.shadowColor,
     this.depth = 4.0,
     this.padding = const EdgeInsets.all(16),
     this.onTap,
@@ -84,15 +84,21 @@ class NeoPopSurfaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeController.isDark(context);
+    final bg = backgroundColor ?? AppColors.cardBg(context);
+    final border = borderColor ?? AppColors.border(context);
+    final shadow = shadowColor ??
+        (isDark ? const Color(0xFF000000) : const Color(0xFFCBD5E1));
+
     final content = Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: backgroundColor,
-        border: Border.all(color: borderColor, width: 1.5),
+        color: bg,
+        border: Border.all(color: border, width: 1.5),
         boxShadow: depth > 0
             ? [
                 BoxShadow(
-                  color: shadowColor,
+                  color: shadow,
                   offset: Offset(depth, depth),
                   blurRadius: 0,
                 ),

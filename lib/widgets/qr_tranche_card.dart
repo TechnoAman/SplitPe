@@ -23,27 +23,30 @@ class QrTrancheCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPaid = tranche.isPaid;
+    final isDark = ThemeController.isDark(context);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: isPaid ? const Color(0xFF0F1713) : const Color(0xFF141416),
+        color: isPaid
+            ? (isDark ? const Color(0xFF0E1E38) : const Color(0xFFF0F7FF))
+            : AppColors.cardBg(context),
         border: Border.all(
           color: isPaid
-              ? AppColors.primaryGreen
+              ? AppColors.primaryBlue
               : isCurrentActive
-                  ? AppColors.neonCyan
-                  : AppColors.cardBorder,
+                  ? AppColors.primaryBlueDark
+                  : AppColors.border(context),
           width: isCurrentActive || isPaid ? 2.0 : 1.5,
         ),
         boxShadow: [
           BoxShadow(
             color: isPaid
-                ? AppColors.primaryGreen.withAlpha(160)
+                ? AppColors.primaryBlue.withAlpha(120)
                 : isCurrentActive
-                    ? AppColors.neonCyan.withAlpha(160)
-                    : const Color(0xFF000000),
-            offset: const Offset(4, 4),
+                    ? AppColors.primaryBlueDark.withAlpha(120)
+                    : (isDark ? const Color(0xFF000000) : const Color(0xFFCBD5E1)),
+            offset: const Offset(3, 3),
             blurRadius: 0,
           ),
         ],
@@ -61,20 +64,20 @@ class QrTrancheCard extends StatelessWidget {
                   NeoPopPillBadge(
                     label: 'TRANCHE ${tranche.index}/$totalTranches',
                     color: isPaid
-                        ? AppColors.primaryGreen
+                        ? AppColors.primaryBlue
                         : isCurrentActive
-                            ? AppColors.neonCyan
-                            : const Color(0xFF27272A),
-                    textColor: isPaid || isCurrentActive ? Colors.black : Colors.white,
+                            ? AppColors.primaryBlueDark
+                            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                    textColor: isPaid || isCurrentActive ? Colors.white : AppColors.text(context),
                   ),
                   if (tranche.payerName != null) ...[
                     const SizedBox(width: 8),
                     Text(
                       tranche.payerName!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: AppColors.text(context),
                       ),
                     ),
                   ],
@@ -84,9 +87,9 @@ class QrTrancheCard extends StatelessWidget {
               if (isPaid)
                 const NeoPopPillBadge(
                   label: '✓ PAID',
-                  color: AppColors.primaryGreen,
-                  textColor: Colors.black,
-                  icon: Icon(Icons.check, size: 10, color: Colors.black),
+                  color: AppColors.primaryBlue,
+                  textColor: Colors.white,
+                  icon: Icon(Icons.check, size: 10, color: Colors.white),
                 )
               else if (isCurrentActive)
                 const NeoPopPillBadge(
@@ -95,10 +98,10 @@ class QrTrancheCard extends StatelessWidget {
                   textColor: Colors.black,
                 )
               else
-                const NeoPopPillBadge(
+                NeoPopPillBadge(
                   label: 'PENDING',
-                  color: Color(0xFF27272A),
-                  textColor: AppColors.textMuted,
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                  textColor: isDark ? AppColors.textMuted : AppColors.lightTextMuted,
                 ),
             ],
           ),
@@ -149,13 +152,13 @@ class QrTrancheCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'AMOUNT DUE',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSub(context),
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -164,7 +167,7 @@ class QrTrancheCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: isPaid ? AppColors.primaryGreen : AppColors.textPrimary,
+                        color: isPaid ? AppColors.primaryBlue : AppColors.text(context),
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -174,20 +177,20 @@ class QrTrancheCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryGreen.withAlpha(20),
-                        border: Border.all(color: AppColors.primaryGreen.withAlpha(80)),
+                        color: AppColors.primaryBlue.withAlpha(20),
+                        border: Border.all(color: AppColors.primaryBlue.withAlpha(80)),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.bolt, size: 12, color: AppColors.primaryGreen),
+                          Icon(Icons.bolt, size: 12, color: AppColors.primaryBlue),
                           SizedBox(width: 3),
                           Text(
                             '0% MDR Arbitrage',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.primaryGreen,
+                              color: AppColors.primaryBlue,
                             ),
                           ),
                         ],

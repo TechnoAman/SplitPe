@@ -36,15 +36,17 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeController.isDark(context);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // CRED NeoPOP Viral Header
+          // Header Card
           NeoPopSurfaceCard(
-            backgroundColor: const Color(0xFF1B112C),
-            borderColor: AppColors.electricPurple,
+            backgroundColor: isDark ? const Color(0xFF131A2E) : const Color(0xFFE8F0FE),
+            borderColor: AppColors.primaryBlue,
             depth: 4.0,
             padding: const EdgeInsets.all(18),
             child: Column(
@@ -60,17 +62,21 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                     SizedBox(width: 8),
                     Text(
                       'Arbitrage Engine',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSecondary),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryBlue,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'HOW MUCH DOES THE NEW MDR COST YOUR BUSINESS?',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                    color: AppColors.text(context),
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -80,10 +86,10 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
 
           const SizedBox(height: 14),
 
-          // Sliders & Controls (CRED NeoPOP Card)
+          // Sliders & Controls Card
           NeoPopSurfaceCard(
-            backgroundColor: const Color(0xFF101012),
-            borderColor: AppColors.neoBorder,
+            backgroundColor: AppColors.cardBg(context),
+            borderColor: AppColors.border(context),
             depth: 4.0,
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -93,13 +99,13 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'MONTHLY UPI TURNOVER',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.0,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSub(context),
                       ),
                     ),
                     Text(
@@ -116,7 +122,9 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: AppColors.goldenYellow,
                     thumbColor: AppColors.goldenYellow,
-                    inactiveTrackColor: const Color(0xFF27272A),
+                    inactiveTrackColor: isDark
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFE2E8F0),
                     trackHeight: 6,
                   ),
                   child: Slider(
@@ -138,13 +146,13 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'AVERAGE TICKET / BILL SIZE',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.0,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSub(context),
                       ),
                     ),
                     Text(
@@ -152,16 +160,18 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.neonCyan,
+                        color: AppColors.primaryBlue,
                       ),
                     ),
                   ],
                 ),
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: AppColors.neonCyan,
-                    thumbColor: AppColors.neonCyan,
-                    inactiveTrackColor: const Color(0xFF27272A),
+                    activeTrackColor: AppColors.primaryBlue,
+                    thumbColor: AppColors.primaryBlue,
+                    inactiveTrackColor: isDark
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFE2E8F0),
                     trackHeight: 6,
                   ),
                   child: Slider(
@@ -188,7 +198,9 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
               // Loss Box
               Expanded(
                 child: NeoPopSurfaceCard(
-                  backgroundColor: const Color(0xFF251016),
+                  backgroundColor: isDark
+                      ? const Color(0xFF251016)
+                      : const Color(0xFFFFF0F2),
                   borderColor: AppColors.alertRed,
                   depth: 3.0,
                   padding: const EdgeInsets.all(14),
@@ -214,9 +226,14 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Paid to banks/aggregators',
-                        style: TextStyle(fontSize: 10, color: AppColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isDark
+                              ? AppColors.textMuted
+                              : AppColors.lightTextMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -227,8 +244,10 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
               // SplitPe 0% MDR Box
               Expanded(
                 child: NeoPopSurfaceCard(
-                  backgroundColor: const Color(0xFF0C2417),
-                  borderColor: AppColors.primaryGreen,
+                  backgroundColor: isDark
+                      ? const Color(0xFF0C1B2E)
+                      : const Color(0xFFF0F7FF),
+                  borderColor: AppColors.primaryBlue,
                   depth: 3.0,
                   padding: const EdgeInsets.all(14),
                   child: Column(
@@ -240,7 +259,7 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.8,
-                          color: AppColors.primaryGreen,
+                          color: AppColors.primaryBlue,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -249,13 +268,18 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w900,
-                          color: AppColors.primaryGreen,
+                          color: AppColors.primaryBlue,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         '100% Retained via 0% MDR',
-                        style: TextStyle(fontSize: 10, color: AppColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: isDark
+                              ? AppColors.textMuted
+                              : AppColors.lightTextMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -268,7 +292,7 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
 
           // Roast Commentary Box
           NeoPopSurfaceCard(
-            backgroundColor: const Color(0xFF141416),
+            backgroundColor: AppColors.cardBg(context),
             borderColor: AppColors.goldenYellow,
             depth: 3.0,
             padding: const EdgeInsets.all(16),
@@ -287,11 +311,11 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                 const SizedBox(height: 8),
                 Text(
                   _roastCommentary,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: AppColors.text(context),
                   ),
                 ),
               ],
@@ -303,15 +327,22 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
           // Viral Clout Share Button
           NeoPopActionButton(
             text: 'TWEET THIS MDR ROAST ON X 🔥',
-            color: Colors.white,
-            textColor: Colors.black,
-            prefixIcon: const Icon(Icons.send_rounded, color: Colors.black, size: 16),
+            color: isDark ? Colors.white : AppColors.primaryBlue,
+            textColor: isDark ? Colors.black : Colors.white,
+            prefixIcon: Icon(
+              Icons.send_rounded,
+              color: isDark ? Colors.black : Colors.white,
+              size: 16,
+            ),
             onTap: () {
-              final tweet = '🚨 I calculated how much the new 0.4% UPI MDR is costing my business:\n\n'
+              final tweet =
+                  '🚨 I calculated how much the new 0.4% UPI MDR is costing my business:\n\n'
                   '💸 Lost: ${_currencyFormat.format(_annualMdrLoss)}/year to payment gateways!\n'
                   '🛡️ Saved with @SplitPe via sub-₹2,000 smart tranche routing.\n\n'
                   '#Fintech #UPI #SplitPe #MDR';
-              final url = Uri.parse('https://twitter.com/intent/tweet?text=${Uri.encodeComponent(tweet)}');
+              final url = Uri.parse(
+                'https://twitter.com/intent/tweet?text=${Uri.encodeComponent(tweet)}',
+              );
               launchUrl(url, mode: LaunchMode.externalApplication);
             },
           ),

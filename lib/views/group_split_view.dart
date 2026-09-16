@@ -61,16 +61,17 @@ class _GroupSplitViewState extends State<GroupSplitView> {
   @override
   Widget build(BuildContext context) {
     final order = _groupOrder;
+    final isDark = ThemeController.isDark(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // CRED NeoPOP Header Card
+          // Header Card
           NeoPopSurfaceCard(
-            backgroundColor: const Color(0xFF101012),
-            borderColor: AppColors.neoBorder,
+            backgroundColor: AppColors.cardBg(context),
+            borderColor: AppColors.border(context),
             depth: 4.0,
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -78,7 +79,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.groups_rounded, color: AppColors.neonCyan, size: 20),
+                    Icon(Icons.groups_rounded, color: AppColors.primaryBlue, size: 20),
                     SizedBox(width: 8),
                     Text(
                       'GROUP BILL SPLIT (ZERO MDR)',
@@ -86,7 +87,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.1,
-                        color: AppColors.neonCyan,
+                        color: AppColors.primaryBlue,
                       ),
                     ),
                   ],
@@ -96,12 +97,12 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                 // Amount
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       '₹',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.neonCyan,
+                        color: AppColors.text(context),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -109,15 +110,17 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                       child: TextField(
                         controller: _amountController,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
-                          color: AppColors.textPrimary,
+                          color: AppColors.text(context),
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: '0.00',
-                          hintStyle: TextStyle(color: AppColors.textMuted),
+                          hintStyle: TextStyle(
+                            color: isDark ? const Color(0xFF383B46) : const Color(0xFFCBD5E1),
+                          ),
                         ),
                         onSubmitted: (_) => _recalculateGroup(),
                       ),
@@ -131,23 +134,23 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'NUMBER OF PEOPLE:',
+                    Text(
+                      'NUMBER OF FRIENDS:',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.0,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSub(context),
                       ),
                     ),
                     Row(
                       children: [
                         NeoPopButton(
-                          color: const Color(0xFF1E1E22),
-                          bottomShadowColor: Colors.black,
-                          rightShadowColor: Colors.black,
+                          color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFE2E8F0),
+                          bottomShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
+                          rightShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
                           depth: 2.0,
-                          border: Border.all(color: AppColors.cardBorder, width: 1.2),
+                          border: Border.all(color: AppColors.border(context), width: 1.2),
                           onTapUp: () {
                             if (_peopleCount > 2) {
                               setState(() {
@@ -156,33 +159,33 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                               });
                             }
                           },
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(Icons.remove, size: 16, color: AppColors.textPrimary),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(Icons.remove, size: 16, color: AppColors.text(context)),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           margin: const EdgeInsets.symmetric(horizontal: 6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF18181B),
-                            border: Border.all(color: AppColors.neoBorder, width: 1.2),
+                            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+                            border: Border.all(color: AppColors.border(context), width: 1.2),
                           ),
                           child: Text(
                             '$_peopleCount',
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w900,
-                              color: AppColors.neonCyan,
+                              color: AppColors.primaryBlue,
                             ),
                           ),
                         ),
                         NeoPopButton(
-                          color: const Color(0xFF1E1E22),
-                          bottomShadowColor: Colors.black,
-                          rightShadowColor: Colors.black,
+                          color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFE2E8F0),
+                          bottomShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
+                          rightShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
                           depth: 2.0,
-                          border: Border.all(color: AppColors.cardBorder, width: 1.2),
+                          border: Border.all(color: AppColors.border(context), width: 1.2),
                           onTapUp: () {
                             if (_peopleCount < 8) {
                               setState(() {
@@ -191,9 +194,9 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                               });
                             }
                           },
-                          child: const Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Icon(Icons.add, size: 16, color: AppColors.textPrimary),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(Icons.add, size: 16, color: AppColors.text(context)),
                           ),
                         ),
                       ],
@@ -209,9 +212,9 @@ class _GroupSplitViewState extends State<GroupSplitView> {
           // Quick Share WhatsApp Button
           NeoPopActionButton(
             text: 'SHARE SPLIT LINKS ON WHATSAPP 📲',
-            color: AppColors.neonCyan,
-            textColor: Colors.black,
-            prefixIcon: const Icon(Icons.share_rounded, color: Colors.black, size: 16),
+            color: AppColors.primaryBlue,
+            textColor: Colors.white,
+            prefixIcon: const Icon(Icons.share_rounded, color: Colors.white, size: 16),
             onTap: _shareAllViaWhatsApp,
           ),
 
@@ -220,11 +223,11 @@ class _GroupSplitViewState extends State<GroupSplitView> {
           if (order != null) ...[
             Text(
               'INDIVIDUAL SHARES (${order.tranches.length})',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.2,
-                color: AppColors.textSecondary,
+                color: AppColors.textSub(context),
               ),
             ),
             const SizedBox(height: 10),

@@ -140,12 +140,38 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 14),
               const Text(
-                'NPCI charges 0.4% MDR on single UPI transactions exceeding ₹2,000.\n\n'
-                'Transactions of ₹2,000 or less remain 100% FREE.\n\n'
-                'SplitPe automatically splits your bill into compliant sub-₹2,000 tranches so you keep 100% of your earnings.',
-                style: TextStyle(fontSize: 13, height: 1.5, color: AppColors.textSecondary),
+                '• NPCI guidelines mandate interchange fees on merchant transactions exceeding ₹2,000.\n'
+                '• Transactions of ₹2,000 or under remain 0% MDR compliant.\n'
+                '• SplitPe demonstrates algorithmic bill tranching to simulate surcharge-free transactions.',
+                style: TextStyle(fontSize: 12, height: 1.5, color: AppColors.textSecondary),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1A14),
+                  border: Border.all(color: const Color(0xFF5A4418)),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('⚖️', style: TextStyle(fontSize: 14)),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'DISCLAIMER: This application is designed strictly for educational, academic demonstration, and algorithmic simulation purposes.',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFFBBF24),
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
               SizedBox(
                 width: double.infinity,
                 height: 44,
@@ -155,9 +181,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: const RoundedRectangleBorder(),
                   ),
-                  child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.w700)),
+                  child: const Text(
+                    'I UNDERSTAND',
+                    style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.8),
+                  ),
                 ),
               ),
             ],

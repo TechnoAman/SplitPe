@@ -42,6 +42,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     KiranaPreset(title: 'FULL RATION', amount: 7500),
   ];
 
+  static const List<String> _upiHandles = [
+    '@okhdfcbank',
+    '@okaxis',
+    '@paytm',
+    '@ybl',
+    '@upi',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -88,6 +96,245 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     }
   }
 
+  void _showUpiInputDialog() {
+    final tempVpaController = TextEditingController(text: _vpaController.text);
+    final tempNameController = TextEditingController(text: _nameController.text);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          decoration: const BoxDecoration(
+            color: Color(0xFF0F1014),
+            border: Border(
+              top: BorderSide(color: AppColors.primaryGreen, width: 2.0),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'ENTER MERCHANT UPI ID',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.2,
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(Icons.close, color: AppColors.textSecondary, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // UPI ID (VPA) Input
+              const Text(
+                'UPI ID (VPA)',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: AppColors.neoBorder, width: 1.2),
+                ),
+                child: TextField(
+                  controller: tempVpaController,
+                  autofocus: true,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: 'e.g. guptakirana@okhdfcbank',
+                    hintStyle: TextStyle(color: Color(0xFF4A4E5C), fontSize: 13),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // Quick Handle Chips
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _upiHandles.map((handle) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: InkWell(
+                        onTap: () {
+                          final current = tempVpaController.text.split('@').first;
+                          if (current.isNotEmpty) {
+                            tempVpaController.text = '$current$handle';
+                          } else {
+                            tempVpaController.text = handle;
+                          }
+                          setModalState(() {});
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1B1C22),
+                            border: Border.all(color: const Color(0xFF2E303A)),
+                          ),
+                          child: Text(
+                            handle,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              // Store / Merchant Name Input
+              const Text(
+                'MERCHANT / STORE NAME (OPTIONAL)',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: AppColors.neoBorder, width: 1.2),
+                ),
+                child: TextField(
+                  controller: tempNameController,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: 'e.g. Gupta Kirana Store',
+                    hintStyle: TextStyle(color: Color(0xFF4A4E5C), fontSize: 13),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Scan QR Alternative Button
+              InkWell(
+                onTap: () {
+                  Navigator.pop(ctx);
+                  scanMerchantQr();
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF14151B),
+                    border: Border.all(color: const Color(0xFF2E303A)),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.qr_code_scanner, size: 16, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'OR SCAN MERCHANT QR CODE',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Confirm Button
+              NeoPopButton(
+                color: AppColors.primaryGreen,
+                border: Border.all(color: Colors.black, width: 1.5),
+                depth: 3.0,
+                onTapUp: () {
+                  final vpa = tempVpaController.text.trim();
+                  if (vpa.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter a valid UPI ID (e.g. store@upi)'),
+                        backgroundColor: AppColors.alertRed,
+                      ),
+                    );
+                    return;
+                  }
+
+                  setState(() {
+                    _vpaController.text = vpa;
+                    _nameController.text = tempNameController.text.trim().isNotEmpty
+                        ? tempNameController.text.trim()
+                        : vpa.split('@').first.toUpperCase();
+                    _recalculateOrder();
+                  });
+
+                  Navigator.pop(ctx);
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Center(
+                    child: Text(
+                      'CONFIRM UPI ID ⚡',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _recalculateOrder() {
     final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
     if (amt <= 0) return;
@@ -110,6 +357,11 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   }
 
   void _openCheckoutDialog() {
+    if (_vpaController.text.trim().isEmpty) {
+      _showUpiInputDialog();
+      return;
+    }
+
     _recalculateOrder();
     if (_currentOrder == null) return;
 
@@ -134,6 +386,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
     final trancheCount = (amt / 1999.0).ceil();
     final standardFee = (amt * 0.004).toStringAsFixed(2);
+    final isVpaSet = _vpaController.text.trim().isNotEmpty;
 
     return Column(
       children: [
@@ -153,13 +406,13 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   const SizedBox(height: 12),
                 ],
 
-                // CRED NeoPOP Merchant Bar
+                // CRED NeoPOP Merchant Bar (Tap to Enter / Change UPI ID)
                 NeoPopCard(
-                  color: AppColors.surface,
-                  borderColor: AppColors.neoBorder,
-                  depth: 2,
+                  color: isVpaSet ? AppColors.surface : const Color(0xFF14151B),
+                  borderColor: isVpaSet ? AppColors.neoBorder : AppColors.primaryGreen,
+                  depth: 3,
                   child: InkWell(
-                    onTap: scanMerchantQr,
+                    onTap: _showUpiInputDialog,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       child: Row(
@@ -168,12 +421,15 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: Colors.black,
-                              border: Border.all(color: AppColors.primaryGreen, width: 1.0),
+                              border: Border.all(
+                                color: isVpaSet ? AppColors.primaryGreen : AppColors.goldenYellow,
+                                width: 1.0,
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.storefront_sharp,
+                            child: Icon(
+                              isVpaSet ? Icons.storefront_sharp : Icons.add_link_rounded,
                               size: 16,
-                              color: AppColors.primaryGreen,
+                              color: isVpaSet ? AppColors.primaryGreen : AppColors.goldenYellow,
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -181,24 +437,24 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'PAYING TO MERCHANT',
+                                Text(
+                                  isVpaSet ? 'PAYING TO UPI ID' : 'MERCHANT UPI ID (REQUIRED)',
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 1.2,
-                                    color: AppColors.textMuted,
+                                    color: isVpaSet ? AppColors.textMuted : AppColors.primaryGreen,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  _nameController.text.isNotEmpty
-                                      ? _nameController.text.toUpperCase()
-                                      : 'GUPTA KIRANA & STORE',
-                                  style: const TextStyle(
-                                    fontSize: 13,
+                                  isVpaSet
+                                      ? '${_nameController.text.toUpperCase()} (${_vpaController.text})'
+                                      : 'TAP TO SET UPI ID / VPA',
+                                  style: TextStyle(
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w900,
-                                    color: Colors.white,
+                                    color: isVpaSet ? Colors.white : AppColors.goldenYellow,
                                     letterSpacing: 0.5,
                                   ),
                                   maxLines: 1,
@@ -213,20 +469,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                               color: Colors.black,
                               border: Border.all(color: AppColors.neoBorder),
                             ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.qr_code_scanner, size: 10, color: Colors.white),
-                                SizedBox(width: 4),
-                                Text(
-                                  'SCAN',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0.8,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              isVpaSet ? 'EDIT ▾' : 'ENTER ▾',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.8,
+                              ),
                             ),
                           ),
                         ],
@@ -503,6 +753,35 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 12),
+
+                // Educational Disclaimer Pill
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF141418),
+                      border: Border.all(color: const Color(0xFF26262E)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('⚖️', style: TextStyle(fontSize: 10)),
+                        SizedBox(width: 6),
+                        Text(
+                          'FOR EDUCATIONAL & RESEARCH PURPOSES ONLY',
+                          style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -534,7 +813,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   const Icon(Icons.bolt, color: Colors.black, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'BYPASS ₹$standardFee FEE · PAY ON UPI',
+                    isVpaSet
+                        ? 'BYPASS ₹$standardFee FEE · PAY ON UPI'
+                        : 'ENTER UPI ID · PAY ON UPI ⚡',
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w900,

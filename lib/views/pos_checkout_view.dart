@@ -576,115 +576,256 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
                 const SizedBox(height: 14),
 
-                // CRED NeoPOP Amount Card
-                NeoPopCard(
-                  color: AppColors.cardBg(context),
-                  borderColor: AppColors.border(context),
-                  depth: 4,
+                // Authentic Indian Banknote Currency Voucher Card
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF4F8FC),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark ? AppColors.primaryBlue.withAlpha(120) : const Color(0xFFB8D5FA),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black.withAlpha(120)
+                            : AppColors.primaryBlue.withAlpha(20),
+                        offset: const Offset(0, 4),
+                        blurRadius: 12,
+                      ),
+                    ],
+                  ),
                   child: Stack(
                     children: [
-                      // Authentic Banknote Security Watermark with Transparent Background
-                      Positioned(
-                        right: -5,
-                        top: -5,
-                        bottom: 25,
-                        child: IgnorePointer(
-                          child: ShaderMask(
-                            shaderCallback: (rect) {
-                              return RadialGradient(
-                                center: Alignment.center,
-                                radius: 0.85,
-                                colors: [
-                                  Colors.white.withOpacity(
-                                    isDark ? 0.32 : 0.24,
-                                  ),
-                                  Colors.transparent,
-                                ],
-                                stops: const [0.6, 1.0],
-                              ).createShader(rect);
-                            },
-                            blendMode: BlendMode.dstIn,
-                            child: Image.asset(
-                              'assets/images/gandhi_currency.png',
-                              fit: BoxFit.contain,
+                      // Inner Fine Currency Border
+                      Positioned.fill(
+                        child: Container(
+                          margin: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.primaryBlue.withAlpha(40)
+                                  : const Color(0xFFD6E6FB),
+                              width: 1.0,
                             ),
                           ),
                         ),
                       ),
+
+                      // Currency Content
                       Padding(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            // 1. Banknote Top Header & Serial Number
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  'TOTAL BILL AMOUNT',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.5,
-                                    color: AppColors.textSub(context),
-                                  ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryBlue.withAlpha(isDark ? 50 : 25),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: AppColors.primaryBlue.withAlpha(100),
+                                          width: 0.8,
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        '№ SP-2026-0MDR',
+                                        style: TextStyle(
+                                          fontSize: 8.5,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.6,
+                                          color: AppColors.primaryBlue,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'RESERVE BANK OF SPLITPE',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.0,
+                                        color: AppColors.textSub(context),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const Text(
-                                  'NPCI 0.4% CAP: ₹2,000',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.primaryBlue,
-                                    letterSpacing: 0.8,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'NPCI ₹2,000 CAP',
+                                    style: TextStyle(
+                                      fontSize: 8.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.primaryBlue,
+                                      letterSpacing: 0.5,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+
+                            const SizedBox(height: 10),
+
+                            // 2. Main Amount Row with Security Ribbon & Gandhi Watermark Window
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  '₹',
-                                  style: TextStyle(
-                                    fontSize: 38,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.text(context),
+                                // Left: Currency Denomination & Input
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'TOTAL BILL AMOUNT',
+                                        style: TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 1.2,
+                                          color: AppColors.textSub(context),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '₹',
+                                            style: TextStyle(
+                                              fontSize: 34,
+                                              fontWeight: FontWeight.w900,
+                                              color: AppColors.text(context),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _amountController,
+                                              keyboardType: TextInputType.number,
+                                              style: TextStyle(
+                                                fontSize: 34,
+                                                fontWeight: FontWeight.w900,
+                                                color: AppColors.text(context),
+                                                letterSpacing: -1.0,
+                                              ),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                isDense: true,
+                                                contentPadding: EdgeInsets.zero,
+                                                hintText: '0',
+                                                hintStyle: TextStyle(
+                                                  color: isDark
+                                                      ? const Color(0xFF383B46)
+                                                      : const Color(0xFFCBD5E1),
+                                                ),
+                                              ),
+                                              onChanged: (_) {
+                                                _selectedPresetTitle = 'CUSTOM BILL';
+                                                _recalculateOrder();
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
+
                                 const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _amountController,
-                                    keyboardType: TextInputType.number,
-                                    style: TextStyle(
-                                      fontSize: 38,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.text(context),
-                                      letterSpacing: -1.0,
+
+                                // Center: Holographic Security Ribbon Strip
+                                Container(
+                                  width: 4,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.primaryBlue.withAlpha(200),
+                                        AppColors.neonCyan.withAlpha(180),
+                                        AppColors.primaryBlue.withAlpha(200),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
                                     ),
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                      hintText: '0',
-                                      hintStyle: TextStyle(
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                // Right: Authentic Banknote Watermark Window (Gandhi Portrait)
+                                Container(
+                                  width: 72,
+                                  height: 72,
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isDark
+                                        ? const Color(0xFF0B1220)
+                                        : Colors.white,
+                                    border: Border.all(
+                                      color: isDark
+                                          ? AppColors.primaryBlue.withAlpha(100)
+                                          : const Color(0xFFB8D5FA),
+                                      width: 1.5,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
                                         color: isDark
-                                            ? const Color(0xFF383B46)
-                                            : const Color(0xFFCBD5E1),
+                                            ? Colors.black.withAlpha(80)
+                                            : Colors.black.withAlpha(10),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
                                       ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      'assets/images/gandhi_avatar.png',
+                                      fit: BoxFit.cover,
                                     ),
-                                    onChanged: (_) {
-                                      _selectedPresetTitle = 'CUSTOM BILL';
-                                      _recalculateOrder();
-                                    },
                                   ),
                                 ),
                               ],
                             ),
 
-                            const SizedBox(height: 14),
+                            const SizedBox(height: 8),
 
-                            // CRED NeoPOP Preset Buttons
+                            // 3. Banknote Pledge Note
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'PROMISE TO SPLIT UNDER ₹2,000 · 0% MDR GUARANTEED',
+                                    style: TextStyle(
+                                      fontSize: 8.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.4,
+                                      color: AppColors.textSub(context),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // 4. Quick Preset Chips
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(

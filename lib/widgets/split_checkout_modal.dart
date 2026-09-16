@@ -358,13 +358,30 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                   ] else ...[
                     // Fully Settled View
                     const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF16251C),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.check_rounded, color: AppColors.primaryGreen, size: 36),
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Container(
+                          width: 68,
+                          height: 68,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.primaryGreen, width: 2),
+                            image: const DecorationImage(
+                              image: AssetImage('assets/images/gandhi_currency.png'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primaryGreen,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.check_rounded, color: Colors.black, size: 14),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 14),
                     const Text(
@@ -377,11 +394,12 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '₹${order.totalAmount.toStringAsFixed(0)} settled across $totalSteps tranches with zero MDR fee.',
+                      '₹${order.totalAmount.toStringAsFixed(0)} settled across $totalSteps tranches with zero MDR fee.\nYou retained all your hard-earned Gandhis 💸',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
+                        height: 1.4,
                       ),
                     ),
                     const SizedBox(height: 24),

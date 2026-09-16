@@ -541,62 +541,79 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   color: AppColors.surface,
                   borderColor: AppColors.neoBorder,
                   depth: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'TOTAL BILL AMOUNT',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.5,
-                                color: AppColors.textSecondary,
-                              ),
+                  child: Stack(
+                    children: [
+                      // Subdued Banknote Security Watermark
+                      Positioned(
+                        right: -10,
+                        top: -10,
+                        bottom: -10,
+                        child: IgnorePointer(
+                          child: Opacity(
+                            opacity: 0.09,
+                            child: Image.asset(
+                              'assets/images/gandhi_currency.png',
+                              fit: BoxFit.contain,
                             ),
-                            Text(
-                              'NPCI 0.4% CAP: ₹2,000',
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primaryGreen,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              '₹',
-                              style: TextStyle(
-                                fontSize: 38,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextField(
-                                controller: _amountController,
-                                keyboardType: TextInputType.number,
-                                style: const TextStyle(
-                                  fontSize: 38,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: -1.0,
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'TOTAL BILL AMOUNT',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1.5,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                  hintText: '0',
+                                Text(
+                                  'NPCI 0.4% CAP: ₹2,000',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primaryGreen,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  '₹',
+                                  style: TextStyle(
+                                    fontSize: 38,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _amountController,
+                                    keyboardType: TextInputType.number,
+                                    style: const TextStyle(
+                                      fontSize: 38,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      letterSpacing: -1.0,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      isDense: true,
+                                      contentPadding: EdgeInsets.zero,
+                                      hintText: '0',
                                   hintStyle: TextStyle(
                                     color: Color(0xFF383B46),
                                   ),
@@ -679,7 +696,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                       ],
                     ),
                   ),
-                ),
+                ],
+              ),
+            ),
 
                 const SizedBox(height: 14),
 
@@ -793,25 +812,54 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 6,
+                            vertical: 8,
                           ),
                           color: const Color(0xFF16281D),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'TOTAL SURCHARGE SAVED',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.8,
-                                  color: Colors.white,
+                              Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: AppColors.primaryGreen.withAlpha(120),
+                                  ),
+                                  image: const DecorationImage(
+                                    image: AssetImage('assets/images/gandhi_currency.png'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'GANDHIS SAVED FROM MDR',
+                                      style: TextStyle(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.8,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Real cash retained in pocket',
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textMuted,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Text(
                                 '+₹$standardFee',
                                 style: const TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w900,
                                   color: AppColors.primaryGreen,
                                 ),

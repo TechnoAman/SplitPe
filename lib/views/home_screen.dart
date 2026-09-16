@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../widgets/splitpe_logo.dart';
 import 'group_split_view.dart';
 import 'pos_checkout_view.dart';
 import 'savings_calculator_view.dart';
@@ -49,46 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Split',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                letterSpacing: -0.5,
-              ),
-            ),
-            Text(
-              'Pe',
-              style: TextStyle(
-                color: AppColors.primaryGreen,
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E2922),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: AppColors.primaryGreen.withAlpha(80)),
-              ),
-              child: const Text(
-                '0% MDR',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-            ),
-          ],
-        ),
+        title: const SplitPeLogo(size: 24),
         actions: [
           IconButton(
             onPressed: _handleTopBarScan,

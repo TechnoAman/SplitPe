@@ -6,6 +6,7 @@ import '../models/tranche.dart';
 import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
 import 'clout_share_modal.dart';
+import 'splitpe_logo.dart';
 
 class SplitCheckoutDialog extends StatefulWidget {
   final SplitOrder order;
@@ -119,21 +120,27 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF222228),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          isDone ? 'COMPLETED' : 'TRANCHE ${_activeStepIndex + 1} OF $totalSteps',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textSecondary,
-                            letterSpacing: 0.5,
+                      Row(
+                        children: [
+                          const SplitPeLogo(size: 16, showBadge: false),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF222228),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              isDone ? 'COMPLETED' : 'TRANCHE ${_activeStepIndex + 1} OF $totalSteps',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textSecondary,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),

@@ -18,7 +18,7 @@ void main() {
 
   testWidgets('SplitPeApp smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const SplitPeApp());
-    expect(find.text('Split'), findsOneWidget);
-    expect(find.text('Pe'), findsOneWidget);
+    expect(find.text('SPLIT'), findsOneWidget);
+    expect(find.text('PE'), findsOneWidget);
   });
 }

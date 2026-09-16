@@ -370,7 +370,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                             shape: BoxShape.circle,
                             border: Border.all(color: AppColors.primaryBlue, width: 2),
                             image: const DecorationImage(
-                              image: AssetImage('assets/images/gandhi_currency.png'),
+                              image: AssetImage('assets/images/gandhi_avatar.png'),
                               fit: BoxFit.cover,
                             ),
                           ),

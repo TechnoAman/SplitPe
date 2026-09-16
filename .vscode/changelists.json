@@ -2,9 +2,7 @@
   "changelists": [
     {
       "name": "Default",
-      "files": [
-        "lib/views/pos_checkout_view.dart"
-      ]
+      "files": []
     }
   ],
   "active": "Default"

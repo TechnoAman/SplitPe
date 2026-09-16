@@ -583,11 +583,11 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   depth: 4,
                   child: Stack(
                     children: [
-                      // Prominent Banknote Security Watermark with Seamless Radial Fade Mask
+                      // Authentic Banknote Security Watermark with Transparent Background
                       Positioned(
-                        right: 0,
-                        top: 0,
-                        bottom: 35,
+                        right: -5,
+                        top: -5,
+                        bottom: 25,
                         child: IgnorePointer(
                           child: ShaderMask(
                             shaderCallback: (rect) {
@@ -596,11 +596,11 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 radius: 0.85,
                                 colors: [
                                   Colors.white.withOpacity(
-                                    isDark ? 0.36 : 0.42,
+                                    isDark ? 0.32 : 0.24,
                                   ),
                                   Colors.transparent,
                                 ],
-                                stops: const [0.55, 1.0],
+                                stops: const [0.6, 1.0],
                               ).createShader(rect);
                             },
                             blendMode: BlendMode.dstIn,
@@ -901,7 +901,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   ),
                                   image: const DecorationImage(
                                     image: AssetImage(
-                                      'assets/images/gandhi_currency.png',
+                                      'assets/images/gandhi_avatar.png',
                                     ),
                                     fit: BoxFit.cover,
                                   ),

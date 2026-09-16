@@ -894,20 +894,22 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                           color: AppColors.chipBg(context),
                           child: Row(
                             children: [
-                              Container(
+                               Container(
                                 width: 30,
                                 height: 30,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
+                                  color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
                                   border: Border.all(
                                     color: AppColors.primaryBlue.withAlpha(160),
                                     width: 1.5,
                                   ),
-                                  image: const DecorationImage(
-                                    image: AssetImage(
-                                      'assets/images/gandhi_avatar.png',
-                                    ),
-                                    fit: BoxFit.cover,
+                                ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.savings_outlined,
+                                    size: 16,
+                                    color: AppColors.primaryBlue,
                                   ),
                                 ),
                               ),

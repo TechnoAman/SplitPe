@@ -61,18 +61,19 @@ class CloutShareModal extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 26,
-                      height: 26,
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
+                        color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.primaryBlue.withAlpha(180),
-                          width: 1.2,
+                          color: AppColors.primaryBlue.withAlpha(120),
+                          width: 1.0,
                         ),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/images/gandhi_avatar.png'),
-                          fit: BoxFit.cover,
-                        ),
+                      ),
+                      child: const Icon(
+                        Icons.shield_outlined,
+                        size: 15,
+                        color: AppColors.primaryBlue,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -207,7 +208,7 @@ class CloutShareModal extends StatelessWidget {
 
                         const SizedBox(height: 10),
 
-                        // MDR Saved Highlight with Gandhi Badge
+                        // MDR Saved Highlight
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                           decoration: BoxDecoration(
@@ -218,26 +219,12 @@ class CloutShareModal extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
+                              const Row(
                                 children: [
-                                  Container(
-                                    width: 18,
-                                    height: 18,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: AppColors.primaryBlue.withAlpha(160),
-                                        width: 1.0,
-                                      ),
-                                      image: const DecorationImage(
-                                        image: AssetImage('assets/images/gandhi_avatar.png'),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  const Text(
-                                    'Gandhis Retained',
+                                  Icon(Icons.bolt, color: AppColors.primaryBlue, size: 16),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Gandhis Retained (MDR Saved)',
                                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryBlue),
                                   ),
                                 ],

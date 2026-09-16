@@ -45,17 +45,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeController.isDark(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg(context),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.bg(context),
         elevation: 0,
         title: const SplitPeLogo(size: 24),
         actions: [
           IconButton(
             onPressed: _handleTopBarScan,
-            icon: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 22),
+            icon: Icon(
+              Icons.qr_code_scanner_rounded,
+              color: AppColors.text(context),
+              size: 22,
+            ),
             tooltip: 'Scan Merchant QR',
+          ),
+          ValueListenableBuilder<ThemeMode>(
+            valueListenable: ThemeController.themeMode,
+            builder: (context, mode, _) {
+              final dark = mode == ThemeMode.dark;
+              return IconButton(
+                onPressed: ThemeController.toggleTheme,
+                icon: Icon(
+                  dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                  color: dark ? AppColors.goldenYellow : AppColors.primaryBlueDark,
+                  size: 22,
+                ),
+                tooltip: dark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+              );
+            },
           ),
           IconButton(
             onPressed: () => _showAboutMdrDialog(context),
@@ -69,37 +90,58 @@ class _HomeScreenState extends State<HomeScreen> {
         children: _views,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF0F0F12),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF0F0F12) : Colors.white,
           border: Border(
-            top: BorderSide(color: Color(0xFF202024), width: 1.0),
+            top: BorderSide(
+              color: isDark ? const Color(0xFF202024) : const Color(0xFFE2E8F0),
+              width: 1.0,
+            ),
           ),
         ),
         child: NavigationBar(
           selectedIndex: _currentIndex,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          indicatorColor: const Color(0xFF1F2923),
+          indicatorColor: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (index) {
             setState(() {
               _currentIndex = index;
             });
           },
-          destinations: const [
+          destinations: [
             NavigationDestination(
-              icon: Icon(Icons.point_of_sale_outlined, color: AppColors.textSecondary),
-              selectedIcon: Icon(Icons.point_of_sale_rounded, color: AppColors.primaryGreen),
+              icon: Icon(
+                Icons.point_of_sale_outlined,
+                color: AppColors.textSub(context),
+              ),
+              selectedIcon: const Icon(
+                Icons.point_of_sale_rounded,
+                color: AppColors.primaryBlue,
+              ),
               label: 'POS Split',
             ),
             NavigationDestination(
-              icon: Icon(Icons.group_outlined, color: AppColors.textSecondary),
-              selectedIcon: Icon(Icons.group_rounded, color: AppColors.primaryGreen),
+              icon: Icon(
+                Icons.group_outlined,
+                color: AppColors.textSub(context),
+              ),
+              selectedIcon: const Icon(
+                Icons.group_rounded,
+                color: AppColors.primaryBlue,
+              ),
               label: 'Group Split',
             ),
             NavigationDestination(
-              icon: Icon(Icons.calculate_outlined, color: AppColors.textSecondary),
-              selectedIcon: Icon(Icons.calculate_rounded, color: AppColors.primaryGreen),
+              icon: Icon(
+                Icons.calculate_outlined,
+                color: AppColors.textSub(context),
+              ),
+              selectedIcon: const Icon(
+                Icons.calculate_rounded,
+                color: AppColors.primaryBlue,
+              ),
               label: 'MDR Roast',
             ),
           ],

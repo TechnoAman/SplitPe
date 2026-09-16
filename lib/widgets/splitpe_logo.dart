@@ -63,7 +63,7 @@ class SplitPeLogo extends StatelessWidget {
               Text(
                 'SPLIT',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.text(context),
                   fontWeight: FontWeight.w900,
                   fontSize: size * 0.68,
                   letterSpacing: 0.5,

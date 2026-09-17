@@ -42,7 +42,7 @@ class SplitPeApp extends StatelessWidget {
                     color: AppColors.bg(context),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.6 : 0.12),
+                        color: Colors.black.withAlpha(isDark ? 153 : 30),
                         blurRadius: 30,
                         offset: const Offset(0, 4),
                       ),

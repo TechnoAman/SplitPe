@@ -35,11 +35,13 @@ https://github.com/user-attachments/assets/cf6e4d3f-3286-4bcd-9004-080d9a7c6520
 
 ## 💡 The Concept: 0% MDR Arbitrage
 
-Under current Indian digital payments guidelines (NPCI), single merchant UPI transactions exceeding **₹2,000** attract interchange/MDR fees (up to 0.4% - 1.1%), while transactions of **₹2,000 or under remain 100% free (0% MDR)**.
+Under current Indian digital payments guidelines (NPCI & CBIC), single merchant UPI transactions exceeding **₹2,000** attract interchange/MDR fees (up to 0.4% - 1.1%) **plus an additional 18% GST** on the MDR service fee, while transactions of **₹2,000 or under remain 100% free (0% MDR & 0% GST)**.
 
-For small kirana merchants, restaurants, and bill payers, high-ticket transactions incur compounding gateway fees. **SplitPe** programmatically solves this by algorithmically tranching any arbitrary bill (e.g. ₹6,800) into optimal sub-₹2,000 compliant micro-slices:
+For small kirana merchants, restaurants, and bill payers, high-ticket transactions incur compounding gateway fees and unclaimable GST. **SplitPe** programmatically solves this by algorithmically tranching any arbitrary bill (e.g. ₹6,800) into optimal sub-₹2,000 compliant micro-slices:
 
 $$\text{Total Bill} = \sum_{i=1}^{n} \text{Tranche}_i \quad \text{where} \quad \forall i, \; \text{Tranche}_i \le ₹1,999.00$$
+
+$$\text{Net Surcharge Paid} = 0\% \text{ MDR} + 0\% \text{ GST} = \mathbf{₹0.00}$$
 
 ---
 

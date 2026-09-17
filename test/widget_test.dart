@@ -15,7 +15,9 @@ void main() {
     final totalSum = order.tranches.fold(0.0, (sum, t) => sum + t.amount);
     expect(totalSum, 7500.0);
     expect(order.mdrStandard, 30.0); // 0.4% of 7500 = 30
-    expect(order.mdrSavings, 30.0); // 100% saved
+    expect(order.gstOnMdr, 5.40); // 18% GST on ₹30 = ₹5.40
+    expect(order.totalStandardFee, 35.40); // ₹30 + ₹5.40 = ₹35.40
+    expect(order.mdrSavings, 35.40); // 100% saved via 0% MDR tranches
   });
 
   test('SplitEngine produces randomized natural tranche amounts instead of static 1999', () {

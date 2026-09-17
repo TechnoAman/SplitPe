@@ -125,7 +125,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                           center: Alignment.center,
                           radius: 0.8,
                           colors: [
-                            Colors.white.withOpacity(isDark ? 0.16 : 0.18),
+                            Colors.white.withAlpha(isDark ? 41 : 46),
                             Colors.transparent,
                           ],
                           stops: const [0.4, 1.0],

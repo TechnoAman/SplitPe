@@ -441,9 +441,12 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   Widget build(BuildContext context) {
     final order = _currentOrder;
     final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
-    final trancheCount =
-        order?.tranches.length ?? (amt > 0 ? (amt / 1999.0).ceil() : 0);
-    final standardFee = (amt * 0.004).toStringAsFixed(2);
+    final baseMdr = (amt <= 2000 ? 0.0 : (amt * 0.004 > 300 ? 300.0 : amt * 0.004));
+    final gstFee = baseMdr * 0.18;
+    final totalFee = baseMdr + gstFee;
+    final standardFee = totalFee.toStringAsFixed(2);
+    final baseMdrStr = baseMdr.toStringAsFixed(2);
+    final gstStr = gstFee.toStringAsFixed(2);
     final isVpaSet = _vpaController.text.trim().isNotEmpty;
     final isDark = ThemeController.isDark(context);
 
@@ -595,8 +598,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 center: Alignment.center,
                                 radius: 0.85,
                                 colors: [
-                                  Colors.white.withOpacity(
-                                    isDark ? 0.22 : 0.26,
+                                  Colors.white.withAlpha(
+                                    isDark ? 56 : 66,
                                   ),
                                   Colors.transparent,
                                 ],
@@ -833,13 +836,23 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                             : AppColors.lightTextMuted,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 3),
                                     Text(
                                       '+₹$standardFee FEE',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w900,
                                         color: AppColors.alertRed,
+                                      ),
+                                    ),
+                                    Text(
+                                      '0.4% MDR + 18% GST',
+                                      style: TextStyle(
+                                        fontSize: 7.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark
+                                            ? AppColors.textMuted
+                                            : AppColors.lightTextMuted,
                                       ),
                                     ),
                                   ],
@@ -870,13 +883,21 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                         color: AppColors.primaryBlue,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 3),
                                     const Text(
                                       '₹0.00 (100% FREE)',
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w900,
                                         color: AppColors.primaryBlue,
+                                      ),
+                                    ),
+                                    Text(
+                                      '0% MDR · 0% GST',
+                                      style: TextStyle(
+                                        fontSize: 7.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryBlue.withAlpha(200),
                                       ),
                                     ),
                                   ],
@@ -921,7 +942,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'GANDHIS SAVED FROM MDR',
+                                      'GANDHIS SAVED (MDR + GST)',
                                       style: TextStyle(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w900,
@@ -930,7 +951,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                       ),
                                     ),
                                     Text(
-                                      'Real cash retained in pocket',
+                                      amt <= 2000
+                                          ? 'Transactions ≤ ₹2,000 are already free'
+                                          : 'Saved ₹$baseMdrStr MDR + ₹$gstStr GST (18%)',
                                       style: TextStyle(
                                         fontSize: 8,
                                         fontWeight: FontWeight.w600,

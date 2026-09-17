@@ -16,21 +16,27 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
   double _avgBillSize = 4500;
   final _currencyFormat = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
-  // MDR math: 0.4% on transactions > 2000
-  double get _monthlyMdrLoss {
+  // MDR math: 0.4% base MDR on transactions > 2000 + 18% GST on MDR
+  double get _monthlyBaseMdrLoss {
     if (_avgBillSize <= 2000) return 0.0;
     return _monthlyTurnover * 0.004;
   }
 
+  double get _monthlyGstLoss => _monthlyBaseMdrLoss * 0.18;
+
+  double get _monthlyMdrLoss => _monthlyBaseMdrLoss + _monthlyGstLoss;
+
+  double get _annualBaseMdrLoss => _monthlyBaseMdrLoss * 12;
+  double get _annualGstLoss => _monthlyGstLoss * 12;
   double get _annualMdrLoss => _monthlyMdrLoss * 12;
 
   String get _roastCommentary {
     if (_annualMdrLoss >= 100000) {
-      return '💸 You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr! That is literally a brand new M3 MacBook Pro or a Bali trip funded for payment gateways.';
+      return '💸 You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr (MDR + 18% GST)! That is literally a brand new M3 MacBook Pro or a Bali trip funded for payment gateways.';
     } else if (_annualMdrLoss >= 30000) {
-      return '☕ You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr! That is 1,500 cups of premium filter coffee down the drain.';
+      return '☕ You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr (MDR + 18% GST)! That is 1,500 cups of premium filter coffee down the drain.';
     } else {
-      return '🛡️ SplitPe shields every single rupee with compliant sub-₹2,000 tranche routing.';
+      return '🛡️ SplitPe shields every single rupee with compliant sub-₹2,000 tranche routing (Zero MDR & Zero GST).';
     }
   }
 
@@ -288,6 +294,44 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
             ],
           ),
 
+          if (_annualMdrLoss > 0) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.chipBg(context),
+                border: Border.all(color: AppColors.border(context)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.receipt_long_outlined, size: 14, color: AppColors.primaryBlue),
+                      const SizedBox(width: 6),
+                      Text(
+                        '0.4% Base MDR: ${_currencyFormat.format(_annualBaseMdrLoss)}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.text(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '+ 18% GST: ${_currencyFormat.format(_annualGstLoss)}',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.alertRed,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           const SizedBox(height: 14),
 
           // Roast Commentary Box
@@ -336,10 +380,11 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
             ),
             onTap: () {
               final tweet =
-                  '🚨 I calculated how much the new 0.4% UPI MDR is costing my business:\n\n'
-                  '💸 Lost: ${_currencyFormat.format(_annualMdrLoss)}/year to payment gateways!\n'
-                  '🛡️ Saved with @SplitPe via sub-₹2,000 smart tranche routing.\n\n'
-                  '#Fintech #UPI #SplitPe #MDR';
+                  '🚨 I calculated how much the new 0.4% UPI MDR + 18% GST is costing my business:\n\n'
+                  '💸 Total Loss: ${_currencyFormat.format(_annualMdrLoss)}/year to payment aggregators!\n'
+                  '🛡️ Saved with @SplitPe via sub-₹2,000 smart tranche routing (0% MDR + 0% GST).\n\n'
+                  'Check it out: https://technoaman.github.io/SplitPe/\n'
+                  '#Fintech #UPI #SplitPe #ZeroMDR';
               final url = Uri.parse(
                 'https://twitter.com/intent/tweet?text=${Uri.encodeComponent(tweet)}',
               );

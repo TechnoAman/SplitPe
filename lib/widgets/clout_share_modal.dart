@@ -23,7 +23,7 @@ class CloutShareModal extends StatelessWidget {
     final tweetText = Uri.encodeComponent(
       '🔥 Just settled a ₹${order.totalAmount.toStringAsFixed(0)} bill with ₹0 MDR using @SplitPe!\n\n'
       '⚡ Split into ${order.tranches.length} sub-₹2,000 tranches.\n'
-      '💰 Net MDR Surcharge Paid: ₹0.00 (Saved ₹${order.mdrSavings.toStringAsFixed(2)})\n\n'
+      '💰 Net MDR + GST Surcharge Paid: ₹0.00 (Saved ₹${order.mdrSavings.toStringAsFixed(2)})\n\n'
       '100% Compliant #UPI #Fintech #SplitPe #ZeroMDR',
     );
 
@@ -118,7 +118,7 @@ class CloutShareModal extends StatelessWidget {
                             center: Alignment.center,
                             radius: 0.8,
                             colors: [
-                              Colors.white.withOpacity(isDark ? 0.16 : 0.18),
+                              Colors.white.withAlpha(isDark ? 41 : 46),
                               Colors.transparent,
                             ],
                             stops: const [0.4, 1.0],
@@ -222,7 +222,7 @@ class CloutShareModal extends StatelessWidget {
                               const SizedBox(width: 6),
                               const Expanded(
                                 child: Text(
-                                  'MDR Surcharge Saved',
+                                  'MDR + 18% GST Saved',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,

@@ -5,14 +5,17 @@
   <p>An experimental fintech application built with Flutter & CRED NeoPOP Design System.</p>
 
   <p>
+    <a href="https://technoaman.github.io/SplitPe/"><img src="https://img.shields.io/badge/🌐_Live_Demo-Visit_SplitPe_Web-00E676?style=for-the-badge&logoColor=black" alt="Live Demo" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/Design-CRED_NeoPOP-00E676?style=for-the-badge&logo=flutter&logoColor=black" alt="CRED NeoPOP" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/NPCI_MDR-0%25_Arbitrage-00FF66?style=for-the-badge" alt="0% MDR" /></a>
   </p>
+
+  <p>
+    🔗 <strong>Live App:</strong> <a href="https://technoaman.github.io/SplitPe/">https://technoaman.github.io/SplitPe/</a>
+  </p>
 </div>
-
-
 
 https://github.com/user-attachments/assets/cf6e4d3f-3286-4bcd-9004-080d9a7c6520
 

@@ -50,6 +50,8 @@ class AppColors {
           ? surface
           : lightSurface;
 
+  static Color card(BuildContext context) => cardBg(context);
+
   static Color cardElevated(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
           ? surfaceElevated

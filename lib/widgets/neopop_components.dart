@@ -11,6 +11,7 @@ class NeoPopActionButton extends StatelessWidget {
   final Widget? prefixIcon;
   final double depth;
   final bool isFullWidth;
+  final double borderRadius;
 
   const NeoPopActionButton({
     super.key,
@@ -19,8 +20,9 @@ class NeoPopActionButton extends StatelessWidget {
     this.color = AppColors.primaryGreen,
     this.textColor = Colors.black,
     this.prefixIcon,
-    this.depth = 4.0,
+    this.depth = 3.0,
     this.isFullWidth = true,
+    this.borderRadius = 8.0,
   });
 
   @override
@@ -34,7 +36,10 @@ class NeoPopActionButton extends StatelessWidget {
       border: Border.all(color: Colors.black, width: 1.5),
       child: Container(
         width: isFullWidth ? double.infinity : null,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
         child: Row(
           mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -70,6 +75,7 @@ class NeoPopSurfaceCard extends StatelessWidget {
   final double depth;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
+  final double borderRadius;
 
   const NeoPopSurfaceCard({
     super.key,
@@ -77,9 +83,10 @@ class NeoPopSurfaceCard extends StatelessWidget {
     this.backgroundColor,
     this.borderColor,
     this.shadowColor,
-    this.depth = 4.0,
+    this.depth = 3.0,
     this.padding = const EdgeInsets.all(16),
     this.onTap,
+    this.borderRadius = 12.0,
   });
 
   @override
@@ -94,7 +101,8 @@ class NeoPopSurfaceCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: bg,
-        border: Border.all(color: border, width: 1.5),
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: border, width: 1.4),
         boxShadow: depth > 0
             ? [
                 BoxShadow(
@@ -109,7 +117,11 @@ class NeoPopSurfaceCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return InkWell(onTap: onTap, child: content);
+      return InkWell(
+        borderRadius: BorderRadius.circular(borderRadius),
+        onTap: onTap,
+        child: content,
+      );
     }
     return content;
   }
@@ -121,6 +133,7 @@ class NeoPopPillBadge extends StatelessWidget {
   final Color color;
   final Color textColor;
   final Widget? icon;
+  final double borderRadius;
 
   const NeoPopPillBadge({
     super.key,
@@ -128,17 +141,19 @@ class NeoPopPillBadge extends StatelessWidget {
     this.color = AppColors.primaryGreen,
     this.textColor = Colors.black,
     this.icon,
+    this.borderRadius = 6.0,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: Colors.black, width: 1.2),
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: Colors.black.withAlpha(200), width: 1.2),
         boxShadow: const [
-          BoxShadow(color: Colors.black, offset: Offset(2, 2), blurRadius: 0),
+          BoxShadow(color: Colors.black87, offset: Offset(1.5, 1.5), blurRadius: 0),
         ],
       ),
       child: Row(

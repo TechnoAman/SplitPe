@@ -3,6 +3,7 @@ import 'package:neopop/neopop.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
+import '../services/session_ledger_service.dart';
 import '../services/split_engine.dart';
 import '../theme/app_theme.dart';
 import '../widgets/neopop_components.dart';
@@ -50,6 +51,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
 
   void _shareAllViaWhatsApp() {
     if (_groupOrder == null) return;
+    SessionLedgerService.instance.registerOrder(_groupOrder!);
     final perPerson = (_groupOrder!.totalAmount / _peopleCount).toStringAsFixed(2);
     final msg = '🍻 Dinner Bill Split on SplitPe (0% MDR)!\n'
         'Total: ₹${_groupOrder!.totalAmount.toStringAsFixed(0)} | Friends: $_peopleCount\n'
@@ -122,6 +124,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                             color: isDark ? const Color(0xFF383B46) : const Color(0xFFCBD5E1),
                           ),
                         ),
+                        onChanged: (_) => _recalculateGroup(),
                         onSubmitted: (_) => _recalculateGroup(),
                       ),
                     ),
@@ -135,71 +138,52 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'NUMBER OF FRIENDS:',
+                      'SPLIT WITH FRIENDS:',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.0,
                         color: AppColors.textSub(context),
                       ),
                     ),
                     Row(
-                      children: [
-                        NeoPopButton(
-                          color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFE2E8F0),
-                          bottomShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          rightShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          depth: 2.0,
-                          border: Border.all(color: AppColors.border(context), width: 1.2),
-                          onTapUp: () {
-                            if (_peopleCount > 2) {
+                      children: [2, 3, 4, 5, 6].map((count) {
+                        final isSel = _peopleCount == count;
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 5),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(6),
+                            onTap: () {
                               setState(() {
-                                _peopleCount--;
+                                _peopleCount = count;
                                 _recalculateGroup();
                               });
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(Icons.remove, size: 16, color: AppColors.text(context)),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          margin: const EdgeInsets.symmetric(horizontal: 6),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
-                            border: Border.all(color: AppColors.border(context), width: 1.2),
-                          ),
-                          child: Text(
-                            '$_peopleCount',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.primaryBlue,
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isSel
+                                    ? AppColors.primaryBlue
+                                    : (isDark ? const Color(0xFF1B1D28) : const Color(0xFFE2E8F0)),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isSel
+                                      ? AppColors.primaryBlue
+                                      : (isDark ? const Color(0xFF2C3042) : const Color(0xFFCBD5E1)),
+                                ),
+                              ),
+                              child: Text(
+                                '$count',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                  color: isSel ? Colors.white : AppColors.text(context),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        NeoPopButton(
-                          color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFE2E8F0),
-                          bottomShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          rightShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          depth: 2.0,
-                          border: Border.all(color: AppColors.border(context), width: 1.2),
-                          onTapUp: () {
-                            if (_peopleCount < 8) {
-                              setState(() {
-                                _peopleCount++;
-                                _recalculateGroup();
-                              });
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(Icons.add, size: 16, color: AppColors.text(context)),
-                          ),
-                        ),
-                      ],
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
@@ -209,12 +193,77 @@ class _GroupSplitViewState extends State<GroupSplitView> {
 
           const SizedBox(height: 14),
 
+          // Per-Person Summary Card
+          if (order != null) ...[
+            NeoPopSurfaceCard(
+              backgroundColor: isDark ? const Color(0xFF0D1B2A) : const Color(0xFFEFF6FF),
+              borderColor: AppColors.primaryBlue,
+              depth: 3.0,
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBlue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'EACH PERSON PAYS',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
+                            color: AppColors.primaryBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '₹${(order.totalAmount / _peopleCount).toStringAsFixed(0)} / person',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.text(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00E676).withAlpha(isDark ? 40 : 25),
+                      border: Border.all(color: const Color(0xFF00E676), width: 0.8),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      '0% MDR',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF00E676),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
           // Quick Share WhatsApp Button
           NeoPopActionButton(
             text: 'SHARE SPLIT LINKS ON WHATSAPP 📲',
-            color: AppColors.primaryBlue,
-            textColor: Colors.white,
-            prefixIcon: const Icon(Icons.share_rounded, color: Colors.white, size: 16),
+            color: const Color(0xFF25D366),
+            textColor: Colors.black,
+            prefixIcon: const Icon(Icons.share_rounded, color: Colors.black, size: 16),
             onTap: _shareAllViaWhatsApp,
           ),
 
@@ -246,6 +295,14 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                     setState(() {
                       tranche.status = TrancheStatus.paid;
                       tranche.paidAt = DateTime.now();
+                      SessionLedgerService.instance.updateTrancheStatus(
+                        trancheIndex: tranche.index,
+                        billId: order.hashCode,
+                        status: TrancheStatus.paid,
+                        amount: tranche.amount,
+                        receiverUpiId: order.merchantVpa,
+                        note: 'Group Split: Tranche ${index + 1}/${order.tranches.length}',
+                      );
                     });
                   },
                 );

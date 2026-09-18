@@ -40,6 +40,44 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
     }
   }
 
+  Widget _buildPresetChip(
+    String label,
+    double value,
+    double current,
+    ValueChanged<double> onSelect,
+    bool isDark,
+  ) {
+    final isSelected = (value - current).abs() < 100;
+    return InkWell(
+      onTap: () => onSelect(value),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? Colors.white : AppColors.primaryBlue)
+              : (isDark ? const Color(0xFF14151C) : const Color(0xFFF1F5F9)),
+          border: Border.all(
+            color: isSelected
+                ? (isDark ? Colors.white : AppColors.primaryBlue)
+                : (isDark ? const Color(0xFF282A36) : const Color(0xFFCBD5E1)),
+            width: 1.0,
+          ),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 9.5,
+            fontWeight: FontWeight.w900,
+            color: isSelected
+                ? (isDark ? Colors.black : Colors.white)
+                : (isDark ? AppColors.textSecondary : const Color(0xFF475569)),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeController.isDark(context);
@@ -146,6 +184,22 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                   ),
                 ),
 
+                // Turnover quick presets
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildPresetChip('₹5L', 500000, _monthlyTurnover, (v) => setState(() => _monthlyTurnover = v), isDark),
+                      const SizedBox(width: 6),
+                      _buildPresetChip('₹15L', 1500000, _monthlyTurnover, (v) => setState(() => _monthlyTurnover = v), isDark),
+                      const SizedBox(width: 6),
+                      _buildPresetChip('₹50L', 5000000, _monthlyTurnover, (v) => setState(() => _monthlyTurnover = v), isDark),
+                      const SizedBox(width: 6),
+                      _buildPresetChip('₹1Cr', 10000000, _monthlyTurnover, (v) => setState(() => _monthlyTurnover = v), isDark),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 14),
 
                 // Average Bill Size Slider
@@ -190,6 +244,22 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                         _avgBillSize = val;
                       });
                     },
+                  ),
+                ),
+
+                // Ticket size quick presets
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildPresetChip('₹2,500', 2500, _avgBillSize, (v) => setState(() => _avgBillSize = v), isDark),
+                      const SizedBox(width: 6),
+                      _buildPresetChip('₹4,500', 4500, _avgBillSize, (v) => setState(() => _avgBillSize = v), isDark),
+                      const SizedBox(width: 6),
+                      _buildPresetChip('₹10,000', 10000, _avgBillSize, (v) => setState(() => _avgBillSize = v), isDark),
+                      const SizedBox(width: 6),
+                      _buildPresetChip('₹25,000', 25000, _avgBillSize, (v) => setState(() => _avgBillSize = v), isDark),
+                    ],
                   ),
                 ),
               ],

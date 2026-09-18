@@ -241,15 +241,23 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                     });
                                   },
                                   child: Container(
-                                    height: 3.5,
+                                    height: 5.0,
                                     margin: EdgeInsets.only(right: index == totalSteps - 1 ? 0 : 5),
                                     decoration: BoxDecoration(
                                       color: isPaid
-                                          ? AppColors.primaryBlue
+                                          ? AppColors.emeraldGreen
                                           : isCurrent
-                                              ? (isDark ? Colors.white : AppColors.primaryBlue)
-                                              : (isDark ? const Color(0xFF2E2E34) : const Color(0xFFE2E8F0)),
-                                      borderRadius: BorderRadius.circular(2),
+                                              ? AppColors.primaryBlue
+                                              : (isDark ? const Color(0xFF2E2E38) : const Color(0xFFE2E8F0)),
+                                      borderRadius: BorderRadius.circular(3),
+                                      boxShadow: isCurrent
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primaryBlue.withAlpha(120),
+                                                blurRadius: 6,
+                                              ),
+                                            ]
+                                          : null,
                                     ),
                                   ),
                                 ),
@@ -394,29 +402,51 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryBlue,
                                   foregroundColor: Colors.white,
-                                  elevation: 0,
+                                  elevation: 2,
+                                  shadowColor: AppColors.primaryBlue.withAlpha(140),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: Text(
-                                  'Pay ₹${currentTranche.amount.toStringAsFixed(0)} via UPI',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.bolt_rounded, size: 18),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'PAY ₹${currentTranche.amount.toStringAsFixed(0)} VIA UPI APP',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.6,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            TextButton(
-                              onPressed: _markCurrentAsPaid,
-                              child: Text(
-                                'Mark as Paid (Demo)',
-                                style: TextStyle(
-                                  color: AppColors.textSub(context),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 40,
+                              child: OutlinedButton(
+                                onPressed: _markCurrentAsPaid,
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.text(context),
+                                  side: BorderSide(
+                                    color: isDark ? const Color(0xFF2E3244) : const Color(0xFFCBD5E1),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text(
+                                  '✓ Mark as Paid (Self-reported)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.4,
+                                  ),
                                 ),
                               ),
                             ),

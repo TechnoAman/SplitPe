@@ -554,6 +554,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
   Widget _buildQuickAddChip(String label, double add, bool isDark) {
     return InkWell(
+      borderRadius: BorderRadius.circular(6),
       onTap: () {
         final current = double.tryParse(_amountController.text.trim()) ?? 0.0;
         final next = (current + add).clamp(0.0, 999999.0);
@@ -562,20 +563,21 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
         _recalculateOrder();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF14151C) : const Color(0xFFF1F5F9),
+          color: isDark ? const Color(0xFF161822) : const Color(0xFFF1F5F9),
           border: Border.all(
-            color: isDark ? const Color(0xFF282A36) : const Color(0xFFCBD5E1),
+            color: isDark ? const Color(0xFF2E3244) : const Color(0xFFCBD5E1),
             width: 1.0,
           ),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 9.5,
-            fontWeight: FontWeight.w800,
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.2,
             color: isDark ? AppColors.textPrimary : const Color(0xFF334155),
           ),
         ),
@@ -824,26 +826,39 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            width: 38,
+                            height: 38,
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? Colors.black
-                                  : const Color(0xFFE2E8F0),
+                                  ? (isVpaSet ? const Color(0xFF0E1A33) : Colors.black)
+                                  : (isVpaSet ? const Color(0xFFE8F1FE) : const Color(0xFFE2E8F0)),
+                              shape: BoxShape.circle,
                               border: Border.all(
                                 color: isVpaSet
                                     ? AppColors.primaryBlue
                                     : AppColors.goldenYellow,
-                                width: 1.0,
+                                width: 1.2,
                               ),
                             ),
-                            child: Icon(
-                              isVpaSet
-                                  ? Icons.storefront_sharp
-                                  : Icons.add_link_rounded,
-                              size: 16,
-                              color: isVpaSet
-                                  ? AppColors.primaryBlue
-                                  : AppColors.goldenYellow,
+                            child: Center(
+                              child: isVpaSet && _nameController.text.trim().isNotEmpty
+                                  ? Text(
+                                      _nameController.text.trim()[0].toUpperCase(),
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.primaryBlue,
+                                      ),
+                                    )
+                                  : Icon(
+                                      isVpaSet
+                                          ? Icons.storefront_rounded
+                                          : Icons.add_link_rounded,
+                                      size: 18,
+                                      color: isVpaSet
+                                          ? AppColors.primaryBlue
+                                          : AppColors.goldenYellow,
+                                    ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -855,17 +870,21 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   children: [
                                     Text(
                                       isVpaSet
-                                          ? 'PAYING TO UPI ID'
+                                          ? 'PAYING TO'
                                           : 'MERCHANT UPI ID (REQUIRED)',
                                       style: TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.w900,
-                                        letterSpacing: 1.2,
+                                        letterSpacing: 1.1,
                                         color: isVpaSet
                                             ? AppColors.textSub(context)
                                             : AppColors.primaryBlue,
                                       ),
                                     ),
+                                    if (isVpaSet) ...[
+                                      const SizedBox(width: 6),
+                                      const Icon(Icons.verified_rounded, size: 12, color: Color(0xFF00E676)),
+                                    ],
                                     if (isSavedQuickPay) ...[
                                       const SizedBox(width: 6),
                                       Container(
@@ -899,31 +918,46 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 const SizedBox(height: 2),
                                 Text(
                                   isVpaSet
-                                      ? '${_nameController.text.toUpperCase()} (${_vpaController.text})'
+                                      ? (_nameController.text.trim().isNotEmpty
+                                          ? _nameController.text.trim().toUpperCase()
+                                          : _vpaController.text.trim())
                                       : 'TAP TO SET UPI ID / VPA',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w900,
                                     color: isVpaSet
                                         ? AppColors.text(context)
                                         : AppColors.goldenYellow,
-                                    letterSpacing: 0.5,
+                                    letterSpacing: 0.3,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
+                                if (isVpaSet && _nameController.text.trim().isNotEmpty) ...[
+                                  Text(
+                                    _vpaController.text.trim(),
+                                    style: const TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.primaryBlue,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
                               ],
                             ),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
+                              horizontal: 9,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? Colors.black
+                                  ? const Color(0xFF1B1D28)
                                   : const Color(0xFFE2E8F0),
+                              borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color: AppColors.border(context),
                               ),
@@ -1230,13 +1264,15 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                           children: [
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.black
-                                      : const Color(0xFFF8FAFC),
+                                      ? const Color(0xFF1E1116)
+                                      : const Color(0xFFFFF1F2),
+                                  borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: AppColors.border(context),
+                                    color: AppColors.alertRed.withAlpha(isDark ? 100 : 70),
+                                    width: 1.0,
                                   ),
                                 ),
                                 child: Column(
@@ -1278,13 +1314,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.black
-                                      : const Color(0xFFF0F7FF),
+                                      ? const Color(0xFF0C192E)
+                                      : const Color(0xFFEFF6FF),
+                                  borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: AppColors.primaryBlue,
+                                    color: AppColors.primaryBlue.withAlpha(isDark ? 120 : 80),
                                     width: 1.0,
                                   ),
                                 ),
@@ -1325,10 +1362,16 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                         const SizedBox(height: 10),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
+                            horizontal: 12,
+                            vertical: 9,
                           ),
-                          color: AppColors.chipBg(context),
+                          decoration: BoxDecoration(
+                            color: AppColors.chipBg(context),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppColors.primaryBlue.withAlpha(isDark ? 80 : 40),
+                            ),
+                          ),
                           child: Row(
                             children: [
                               Container(

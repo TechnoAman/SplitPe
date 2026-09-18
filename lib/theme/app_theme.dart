@@ -3,41 +3,62 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Official CRED NeoPOP Dark Obsidian Architecture
-  static const Color background = Color(0xFF0C0D10);
-  static const Color surface = Color(0xFF16171B);
-  static const Color surfaceElevated = Color(0xFF1E2026);
-  static const Color cardBorder = Color(0xFF2E303A);
-  static const Color subtleBorder = Color(0xFF22242B);
-  static const Color neoBorder = Color(0xFF383B46);
+  static const Color background = Color(0xFF0B0C10);
+  static const Color surface = Color(0xFF13141B);
+  static const Color surfaceElevated = Color(0xFF1B1D26);
+  static const Color cardBorder = Color(0xFF282A38);
+  static const Color subtleBorder = Color(0xFF1F212D);
+  static const Color neoBorder = Color(0xFF333647);
   static const Color hardShadow = Color(0xFF000000);
 
   // Light Mode Color Architecture
-  static const Color lightBackground = Color(0xFFF4F6FA);
+  static const Color lightBackground = Color(0xFFF6F8FC);
   static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightSurfaceElevated = Color(0xFFEBF0F8);
-  static const Color lightCardBorder = Color(0xFFD6E0EE);
+  static const Color lightSurfaceElevated = Color(0xFFEDF2F9);
+  static const Color lightCardBorder = Color(0xFFD3DDEB);
   static const Color lightNeoBorder = Color(0xFFCBD5E1);
-  static const Color lightTextPrimary = Color(0xFF111827);
-  static const Color lightTextSecondary = Color(0xFF4B5563);
-  static const Color lightTextMuted = Color(0xFF9CA3AF);
-  static const Color lightBlueSurface = Color(0xFFE8F0FE);
+  static const Color lightTextPrimary = Color(0xFF0F172A);
+  static const Color lightTextSecondary = Color(0xFF475569);
+  static const Color lightTextMuted = Color(0xFF94A3B8);
+  static const Color lightBlueSurface = Color(0xFFE8F1FE);
 
-  // Google Play & GPay Electric Blue Palette
-  static const Color primaryBlue = Color(0xFF0084FF); // Electric Google Blue
-  static const Color primaryBlueDark = Color(0xFF1A73E8); // Classic Google Material Blue
+  // Vibrant Google Play & GPay Electric Blue Palette
+  static const Color primaryBlue = Color(0xFF0077FF); // Vibrant Electric Blue
+  static const Color primaryBlueDark = Color(0xFF0055DD); // Deep Rich Blue
   static const Color primaryGreen = primaryBlue; // Seamless alias for whole-app blue theme
   static const Color greenDark = primaryBlueDark;
-  static const Color blueSurface = Color(0xFF0E1E38); // Midnight blue container tint
+  static const Color blueSurface = Color(0xFF0E1A33); // Midnight blue container tint
   static const Color neonCyan = Color(0xFF00E5FF);
   static const Color electricPurple = Color(0xFF7C4DFF);
-  static const Color goldenYellow = Color(0xFFFFD600);
-  static const Color alertRed = Color(0xFFFF1744);
+  static const Color goldenYellow = Color(0xFFFFC400);
+  static const Color emeraldGreen = Color(0xFF00E676);
+  static const Color emeraldGreenDark = Color(0xFF00C853);
+  static const Color alertRed = Color(0xFFFF3366);
   static const Color pureWhite = Color(0xFFFFFFFF);
 
   // CRED & Google Typographic Hierarchy
   static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFF8A8F9E);
-  static const Color textMuted = Color(0xFF555A68);
+  static const Color textSecondary = Color(0xFF8C93A8);
+  static const Color textMuted = Color(0xFF565C70);
+
+  // High-End Gradients
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [Color(0xFF0077FF), Color(0xFF00D2FF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient emeraldGradient = LinearGradient(
+    colors: [Color(0xFF00E676), Color(0xFF00B0FF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient roastGradient = LinearGradient(
+    colors: [Color(0xFFFF3366), Color(0xFFFF9100)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   // Context-aware dynamic color getters
   static Color bg(BuildContext context) =>

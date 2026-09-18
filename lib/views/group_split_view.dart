@@ -124,6 +124,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                             color: isDark ? const Color(0xFF383B46) : const Color(0xFFCBD5E1),
                           ),
                         ),
+                        onChanged: (_) => _recalculateGroup(),
                         onSubmitted: (_) => _recalculateGroup(),
                       ),
                     ),
@@ -137,71 +138,52 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'NUMBER OF FRIENDS:',
+                      'SPLIT WITH FRIENDS:',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.0,
                         color: AppColors.textSub(context),
                       ),
                     ),
                     Row(
-                      children: [
-                        NeoPopButton(
-                          color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFE2E8F0),
-                          bottomShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          rightShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          depth: 2.0,
-                          border: Border.all(color: AppColors.border(context), width: 1.2),
-                          onTapUp: () {
-                            if (_peopleCount > 2) {
+                      children: [2, 3, 4, 5, 6].map((count) {
+                        final isSel = _peopleCount == count;
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 5),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(6),
+                            onTap: () {
                               setState(() {
-                                _peopleCount--;
+                                _peopleCount = count;
                                 _recalculateGroup();
                               });
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(Icons.remove, size: 16, color: AppColors.text(context)),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          margin: const EdgeInsets.symmetric(horizontal: 6),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
-                            border: Border.all(color: AppColors.border(context), width: 1.2),
-                          ),
-                          child: Text(
-                            '$_peopleCount',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.primaryBlue,
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isSel
+                                    ? AppColors.primaryBlue
+                                    : (isDark ? const Color(0xFF1B1D28) : const Color(0xFFE2E8F0)),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isSel
+                                      ? AppColors.primaryBlue
+                                      : (isDark ? const Color(0xFF2C3042) : const Color(0xFFCBD5E1)),
+                                ),
+                              ),
+                              child: Text(
+                                '$count',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                  color: isSel ? Colors.white : AppColors.text(context),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        NeoPopButton(
-                          color: isDark ? const Color(0xFF1E1E22) : const Color(0xFFE2E8F0),
-                          bottomShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          rightShadowColor: isDark ? Colors.black : const Color(0xFFCBD5E1),
-                          depth: 2.0,
-                          border: Border.all(color: AppColors.border(context), width: 1.2),
-                          onTapUp: () {
-                            if (_peopleCount < 8) {
-                              setState(() {
-                                _peopleCount++;
-                                _recalculateGroup();
-                              });
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Icon(Icons.add, size: 16, color: AppColors.text(context)),
-                          ),
-                        ),
-                      ],
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
@@ -279,9 +261,9 @@ class _GroupSplitViewState extends State<GroupSplitView> {
           // Quick Share WhatsApp Button
           NeoPopActionButton(
             text: 'SHARE SPLIT LINKS ON WHATSAPP 📲',
-            color: AppColors.primaryBlue,
-            textColor: Colors.white,
-            prefixIcon: const Icon(Icons.share_rounded, color: Colors.white, size: 16),
+            color: const Color(0xFF25D366),
+            textColor: Colors.black,
+            prefixIcon: const Icon(Icons.share_rounded, color: Colors.black, size: 16),
             onTap: _shareAllViaWhatsApp,
           ),
 

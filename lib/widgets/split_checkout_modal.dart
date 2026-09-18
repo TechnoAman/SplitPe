@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
+import '../services/session_ledger_service.dart';
 import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
 import 'clout_share_modal.dart';
@@ -48,6 +49,9 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     final firstUnpaid = widget.order.tranches.indexWhere((t) => !t.isPaid);
     _activeStepIndex = firstUnpaid != -1 ? firstUnpaid : 0;
+
+    // Register all tranches of this split order into the session ledger
+    SessionLedgerService.instance.registerOrder(widget.order);
   }
 
   @override
@@ -66,14 +70,35 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
       tranche.txnRef =
           'TXN${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
 
+      SessionLedgerService.instance.updateTrancheStatus(
+        trancheIndex: tranche.index,
+        billId: widget.order.hashCode,
+        status: TrancheStatus.paid,
+        amount: tranche.amount,
+        receiverUpiId: widget.order.merchantVpa,
+        note: 'Tranche ${tranche.index + 1}/${widget.order.tranches.length}',
+      );
+
       if (widget.order.isFullyPaid) {
         _confettiController.play();
       } else {
         final nextUnpaid = widget.order.tranches.indexWhere((t) => !t.isPaid);
         if (nextUnpaid != -1) {
           _activeStepIndex = nextUnpaid;
+          final nextTranche = widget.order.tranches[_activeStepIndex];
+          nextTranche.status = TrancheStatus.inProgress;
+          SessionLedgerService.instance.updateTrancheStatus(
+            trancheIndex: nextTranche.index,
+            billId: widget.order.hashCode,
+            status: TrancheStatus.inProgress,
+            amount: nextTranche.amount,
+            receiverUpiId: widget.order.merchantVpa,
+            note: 'Tranche ${_activeStepIndex + 1}/${widget.order.tranches.length}',
+          );
         }
       }
+
+      SessionLedgerService.instance.registerOrder(widget.order);
     });
 
     widget.onOrderUpdated?.call(widget.order);
@@ -201,18 +226,38 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                   onTap: () {
                                     setState(() {
                                       _activeStepIndex = index;
+                                      final selectedTranche = widget.order.tranches[_activeStepIndex];
+                                      if (!selectedTranche.isPaid) {
+                                        selectedTranche.status = TrancheStatus.inProgress;
+                                        SessionLedgerService.instance.updateTrancheStatus(
+                                          trancheIndex: selectedTranche.index,
+                                          billId: widget.order.hashCode,
+                                          status: TrancheStatus.inProgress,
+                                          amount: selectedTranche.amount,
+                                          receiverUpiId: widget.order.merchantVpa,
+                                          note: 'Tranche ${_activeStepIndex + 1}/$totalSteps',
+                                        );
+                                      }
                                     });
                                   },
                                   child: Container(
-                                    height: 3.5,
+                                    height: 5.0,
                                     margin: EdgeInsets.only(right: index == totalSteps - 1 ? 0 : 5),
                                     decoration: BoxDecoration(
                                       color: isPaid
-                                          ? AppColors.primaryBlue
+                                          ? AppColors.emeraldGreen
                                           : isCurrent
-                                              ? (isDark ? Colors.white : AppColors.primaryBlue)
-                                              : (isDark ? const Color(0xFF2E2E34) : const Color(0xFFE2E8F0)),
-                                      borderRadius: BorderRadius.circular(2),
+                                              ? AppColors.primaryBlue
+                                              : (isDark ? const Color(0xFF2E2E38) : const Color(0xFFE2E8F0)),
+                                      borderRadius: BorderRadius.circular(3),
+                                      boxShadow: isCurrent
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.primaryBlue.withAlpha(120),
+                                                blurRadius: 6,
+                                              ),
+                                            ]
+                                          : null,
                                     ),
                                   ),
                                 ),
@@ -294,6 +339,35 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                               color: AppColors.primaryBlue,
                             ),
                           ),
+                          if (currentTranche.suggestedDelaySeconds > 0 && !currentTranche.isPaid) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1B1812) : const Color(0xFFFEF3C7),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF785B18) : const Color(0xFFF59E0B),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.timer_outlined, size: 12, color: Color(0xFFF59E0B)),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Pacing window: ~${currentTranche.suggestedDelaySeconds}s (Anti-burst simulation)',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
 
                           const SizedBox(height: 20),
 
@@ -304,7 +378,14 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                               height: 48,
                               child: ElevatedButton(
                                 onPressed: () async {
-                                  final launched = await UpiService.launchUpiIntent(currentTranche.upiUri);
+                                  final launched = await UpiService.launchUpiIntent(
+                                    currentTranche.upiUri,
+                                    amount: currentTranche.amount,
+                                    receiverUpiId: order.merchantVpa,
+                                    note: 'Tranche ${_activeStepIndex + 1}/$totalSteps',
+                                    trancheIndex: currentTranche.index,
+                                    billId: order.hashCode,
+                                  );
                                   if (!launched) {
                                     await UpiService.copyToClipboard(currentTranche.upiUri);
                                     if (context.mounted) {
@@ -321,29 +402,51 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryBlue,
                                   foregroundColor: Colors.white,
-                                  elevation: 0,
+                                  elevation: 2,
+                                  shadowColor: AppColors.primaryBlue.withAlpha(140),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
-                                child: Text(
-                                  'Pay ₹${currentTranche.amount.toStringAsFixed(0)} via UPI',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.bolt_rounded, size: 18),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'PAY ₹${currentTranche.amount.toStringAsFixed(0)} VIA UPI APP',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.6,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            TextButton(
-                              onPressed: _markCurrentAsPaid,
-                              child: Text(
-                                'Mark as Paid (Demo)',
-                                style: TextStyle(
-                                  color: AppColors.textSub(context),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 40,
+                              child: OutlinedButton(
+                                onPressed: _markCurrentAsPaid,
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.text(context),
+                                  side: BorderSide(
+                                    color: isDark ? const Color(0xFF2E3244) : const Color(0xFFCBD5E1),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text(
+                                  '✓ Mark as Paid (Self-reported)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.4,
+                                  ),
                                 ),
                               ),
                             ),
@@ -378,6 +481,18 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                 onPressed: () {
                                   setState(() {
                                     _activeStepIndex++;
+                                    final nextTranche = widget.order.tranches[_activeStepIndex];
+                                    if (!nextTranche.isPaid) {
+                                      nextTranche.status = TrancheStatus.inProgress;
+                                      SessionLedgerService.instance.updateTrancheStatus(
+                                        trancheIndex: nextTranche.index,
+                                        billId: widget.order.hashCode,
+                                        status: TrancheStatus.inProgress,
+                                        amount: nextTranche.amount,
+                                        receiverUpiId: widget.order.merchantVpa,
+                                        note: 'Tranche ${_activeStepIndex + 1}/$totalSteps',
+                                      );
+                                    }
                                   });
                                 },
                                 child: const Text(

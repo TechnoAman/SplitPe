@@ -6,8 +6,9 @@
 
   <p>
     <a href="https://technoaman.github.io/SplitPe/"><img src="https://img.shields.io/badge/🌐_Live_Demo-Visit_SplitPe_Web-00E676?style=for-the-badge&logoColor=black" alt="Live Demo" /></a>
+    <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/🔥_Impressions-1M%2B_Views-FF4500?style=for-the-badge" alt="1M+ Views" /></a>
+    <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/❤️_Viral-15K%2B_Likes-E91E63?style=for-the-badge" alt="15K+ Likes" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/Reddit-850%2B_Upvotes-FF4500?style=for-the-badge&logo=reddit&logoColor=white" alt="Reddit 850+ Upvotes" /></a>
-    <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/Views-169K%2B-FF4500?style=for-the-badge&logo=reddit&logoColor=white" alt="169K+ Views" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/Design-CRED_NeoPOP-00E676?style=for-the-badge&logo=flutter&logoColor=black" alt="CRED NeoPOP" /></a>
     <a href="https://github.com/TechnoAman/SplitPe"><img src="https://img.shields.io/badge/NPCI_MDR-0%25_Arbitrage-00FF66?style=for-the-badge" alt="0% MDR" /></a>
@@ -15,7 +16,7 @@
   </p>
 
   <p>
-    🔗 <strong>Live App:</strong> <a href="https://technoaman.github.io/SplitPe/">https://technoaman.github.io/SplitPe/</a> &nbsp;|&nbsp; 🔺 <strong>850+ Reddit Upvotes</strong> &nbsp;|&nbsp; 👁️ <strong>169K+ Views</strong>
+    🔗 <strong>Live App:</strong> <a href="https://technoaman.github.io/SplitPe/">https://technoaman.github.io/SplitPe/</a> &nbsp;|&nbsp; 🔥 <strong>1M+ Views</strong> &nbsp;|&nbsp; ❤️ <strong>15K+ Likes</strong> &nbsp;|&nbsp; 🔺 <strong>850+ Upvotes</strong>
   </p>
 </div>
 

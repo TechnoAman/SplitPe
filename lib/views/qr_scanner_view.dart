@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../services/split_engine.dart';
+import '../services/upi_validator.dart';
 import '../theme/app_theme.dart';
 
 class QrScannerView extends StatefulWidget {
@@ -49,9 +49,65 @@ class _QrScannerViewState extends State<QrScannerView>
   }
 
   void _handleQrResult(String rawData) {
+    final validation = UpiValidator.validate(rawData);
+    if (!validation.isValid) {
+      _showInvalidQrDialog(validation.errorMessage ?? 'Invalid UPI QR format.');
+      return;
+    }
+
     _hasScanned = true;
-    final parsed = SplitEngine.parseUpiUri(rawData);
-    Navigator.pop(context, parsed);
+    Navigator.pop(context, validation.toLegacyMap());
+  }
+
+  void _showInvalidQrDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1917),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.alertRed, width: 1.5),
+        ),
+        icon: const Icon(Icons.gpp_bad_rounded, color: AppColors.alertRed, size: 36),
+        title: const Text(
+          'INVALID OR UNSAFE QR',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            fontSize: 14,
+            letterSpacing: 0.8,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          errorMessage,
+          style: const TextStyle(
+            color: Color(0xFFE2E8F0),
+            fontSize: 12,
+            height: 1.4,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              setState(() {
+                _hasScanned = false;
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.alertRed,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Scan Again', style: TextStyle(fontWeight: FontWeight.w800)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showManualEntryDialog() {

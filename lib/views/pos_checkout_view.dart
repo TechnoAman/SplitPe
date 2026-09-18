@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:neopop/neopop.dart';
 import '../models/split_order.dart';
 import '../services/split_engine.dart';
+import '../services/upi_validator.dart';
 import '../theme/app_theme.dart';
 import '../widgets/soundbox_speaker_widget.dart';
 import '../widgets/split_checkout_modal.dart';
@@ -347,11 +348,12 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 depth: 3.0,
                 onTapUp: () {
                   final vpa = tempVpaController.text.trim();
-                  if (vpa.isEmpty) {
+                  final validation = UpiValidator.validate(vpa);
+                  if (!validation.isValid) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
-                          'Please enter a valid UPI ID (e.g. store@upi)',
+                          validation.errorMessage ?? 'Please enter a valid UPI ID (e.g. store@upi)',
                         ),
                         backgroundColor: AppColors.alertRed,
                       ),
@@ -360,11 +362,10 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                   }
 
                   setState(() {
-                    _vpaController.text = vpa;
-                    _nameController.text =
-                        tempNameController.text.trim().isNotEmpty
+                    _vpaController.text = validation.vpa!;
+                    _nameController.text = tempNameController.text.trim().isNotEmpty
                         ? tempNameController.text.trim()
-                        : vpa.split('@').first.toUpperCase();
+                        : validation.merchantName!;
                     _recalculateOrder();
                   });
 
@@ -545,6 +546,37 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
+                                if (isVpaSet) ...[
+                                  Builder(
+                                    builder: (context) {
+                                      final val = UpiValidator.validate(_vpaController.text);
+                                      if (val.issuerLabel != null) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 2),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.verified_outlined,
+                                                size: 11,
+                                                color: AppColors.primaryBlue,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                val.issuerLabel!,
+                                                style: const TextStyle(
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.primaryBlue,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      return const SizedBox.shrink();
+                                    },
+                                  ),
+                                ],
                               ],
                             ),
                           ),

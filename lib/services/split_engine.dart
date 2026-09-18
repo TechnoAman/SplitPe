@@ -1,6 +1,7 @@
 import 'dart:math';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
+import 'upi_validator.dart';
 
 class SplitEngine {
   /// Default safe threshold per tranche (below ₹2,000 to be 100% exempt from MDR)
@@ -242,59 +243,9 @@ class SplitEngine {
     return 'upi://pay?$query';
   }
 
-  /// Parses a raw scanned UPI QR string into a map of parameters (pa, pn, am, tn, etc.)
+  /// Parses and validates a raw scanned UPI QR string using UpiValidator
   static Map<String, String> parseUpiUri(String rawData) {
-    var clean = rawData.trim();
-    final Map<String, String> result = {'pa': '', 'pn': '', 'am': '', 'tn': ''};
-
-    if (clean.isEmpty) return result;
-
-    // Remove any surrounding quotes
-    if (clean.startsWith('"') && clean.endsWith('"')) {
-      clean = clean.substring(1, clean.length - 1).trim();
-    }
-
-    // Try standard URI parse
-    try {
-      final uri = Uri.parse(clean);
-      final query = uri.queryParameters;
-      
-      // Case-insensitive query lookup
-      for (final entry in query.entries) {
-        final key = entry.key.toLowerCase();
-        if (key == 'pa') result['pa'] = Uri.decodeComponent(entry.value);
-        if (key == 'pn') result['pn'] = Uri.decodeComponent(entry.value);
-        if (key == 'am') result['am'] = entry.value;
-        if (key == 'tn') result['tn'] = Uri.decodeComponent(entry.value);
-      }
-    } catch (_) {}
-
-    // Regex fallback if standard URI parse didn't find 'pa'
-    if (result['pa']!.isEmpty) {
-      final paMatch = RegExp(r'[?&]pa=([^&]+)', caseSensitive: false).firstMatch(clean);
-      if (paMatch != null) result['pa'] = Uri.decodeComponent(paMatch.group(1) ?? '');
-
-      final pnMatch = RegExp(r'[?&]pn=([^&]+)', caseSensitive: false).firstMatch(clean);
-      if (pnMatch != null) result['pn'] = Uri.decodeComponent(pnMatch.group(1) ?? '');
-
-      final amMatch = RegExp(r'[?&]am=([^&]+)', caseSensitive: false).firstMatch(clean);
-      if (amMatch != null) result['am'] = amMatch.group(1) ?? '';
-
-      final tnMatch = RegExp(r'[?&]tn=([^&]+)', caseSensitive: false).firstMatch(clean);
-      if (tnMatch != null) result['tn'] = Uri.decodeComponent(tnMatch.group(1) ?? '');
-    }
-
-    // Fallback: Direct VPA string (e.g. name@okhdfcbank)
-    if (result['pa']!.isEmpty && clean.contains('@') && !clean.contains('://')) {
-      result['pa'] = clean.replaceAll(RegExp(r'\s+'), '');
-    }
-
-    // Default friendly name from VPA if name is blank
-    if (result['pn']!.isEmpty && result['pa']!.isNotEmpty) {
-      final handle = result['pa']!.split('@').first;
-      result['pn'] = handle[0].toUpperCase() + handle.substring(1);
-    }
-
-    return result;
+    final result = UpiValidator.validate(rawData);
+    return result.toLegacyMap();
   }
 }

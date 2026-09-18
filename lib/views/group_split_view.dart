@@ -3,6 +3,7 @@ import 'package:neopop/neopop.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
+import '../services/session_ledger_service.dart';
 import '../services/split_engine.dart';
 import '../theme/app_theme.dart';
 import '../widgets/neopop_components.dart';
@@ -50,6 +51,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
 
   void _shareAllViaWhatsApp() {
     if (_groupOrder == null) return;
+    SessionLedgerService.instance.registerOrder(_groupOrder!);
     final perPerson = (_groupOrder!.totalAmount / _peopleCount).toStringAsFixed(2);
     final msg = '🍻 Dinner Bill Split on SplitPe (0% MDR)!\n'
         'Total: ₹${_groupOrder!.totalAmount.toStringAsFixed(0)} | Friends: $_peopleCount\n'
@@ -311,6 +313,14 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                     setState(() {
                       tranche.status = TrancheStatus.paid;
                       tranche.paidAt = DateTime.now();
+                      SessionLedgerService.instance.updateTrancheStatus(
+                        trancheIndex: tranche.index,
+                        billId: order.hashCode,
+                        status: TrancheStatus.paid,
+                        amount: tranche.amount,
+                        receiverUpiId: order.merchantVpa,
+                        note: 'Group Split: Tranche ${index + 1}/${order.tranches.length}',
+                      );
                     });
                   },
                 );

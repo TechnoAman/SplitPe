@@ -49,6 +49,9 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     final firstUnpaid = widget.order.tranches.indexWhere((t) => !t.isPaid);
     _activeStepIndex = firstUnpaid != -1 ? firstUnpaid : 0;
+
+    // Register all tranches of this split order into the session ledger
+    SessionLedgerService.instance.registerOrder(widget.order);
   }
 
   @override
@@ -71,6 +74,9 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
         trancheIndex: tranche.index,
         billId: widget.order.hashCode,
         status: TrancheStatus.paid,
+        amount: tranche.amount,
+        receiverUpiId: widget.order.merchantVpa,
+        note: 'Tranche ${tranche.index + 1}/${widget.order.tranches.length}',
       );
 
       if (widget.order.isFullyPaid) {
@@ -79,8 +85,20 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
         final nextUnpaid = widget.order.tranches.indexWhere((t) => !t.isPaid);
         if (nextUnpaid != -1) {
           _activeStepIndex = nextUnpaid;
+          final nextTranche = widget.order.tranches[_activeStepIndex];
+          nextTranche.status = TrancheStatus.inProgress;
+          SessionLedgerService.instance.updateTrancheStatus(
+            trancheIndex: nextTranche.index,
+            billId: widget.order.hashCode,
+            status: TrancheStatus.inProgress,
+            amount: nextTranche.amount,
+            receiverUpiId: widget.order.merchantVpa,
+            note: 'Tranche ${_activeStepIndex + 1}/${widget.order.tranches.length}',
+          );
         }
       }
+
+      SessionLedgerService.instance.registerOrder(widget.order);
     });
 
     widget.onOrderUpdated?.call(widget.order);
@@ -208,6 +226,18 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                   onTap: () {
                                     setState(() {
                                       _activeStepIndex = index;
+                                      final selectedTranche = widget.order.tranches[_activeStepIndex];
+                                      if (!selectedTranche.isPaid) {
+                                        selectedTranche.status = TrancheStatus.inProgress;
+                                        SessionLedgerService.instance.updateTrancheStatus(
+                                          trancheIndex: selectedTranche.index,
+                                          billId: widget.order.hashCode,
+                                          status: TrancheStatus.inProgress,
+                                          amount: selectedTranche.amount,
+                                          receiverUpiId: widget.order.merchantVpa,
+                                          note: 'Tranche ${_activeStepIndex + 1}/$totalSteps',
+                                        );
+                                      }
                                     });
                                   },
                                   child: Container(
@@ -421,6 +451,18 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                 onPressed: () {
                                   setState(() {
                                     _activeStepIndex++;
+                                    final nextTranche = widget.order.tranches[_activeStepIndex];
+                                    if (!nextTranche.isPaid) {
+                                      nextTranche.status = TrancheStatus.inProgress;
+                                      SessionLedgerService.instance.updateTrancheStatus(
+                                        trancheIndex: nextTranche.index,
+                                        billId: widget.order.hashCode,
+                                        status: TrancheStatus.inProgress,
+                                        amount: nextTranche.amount,
+                                        receiverUpiId: widget.order.merchantVpa,
+                                        note: 'Tranche ${_activeStepIndex + 1}/$totalSteps',
+                                      );
+                                    }
                                   });
                                 },
                                 child: const Text(

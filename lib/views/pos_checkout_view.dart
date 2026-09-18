@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:neopop/neopop.dart';
 import '../models/split_order.dart';
-import '../services/split_engine.dart';
 import '../services/quick_pay_service.dart';
+import '../services/session_ledger_service.dart';
+import '../services/split_engine.dart';
 import '../theme/app_theme.dart';
 import '../widgets/soundbox_speaker_widget.dart';
 import '../widgets/split_checkout_modal.dart';
@@ -533,12 +534,15 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
     _recalculateOrder();
     if (_currentOrder == null) return;
 
+    SessionLedgerService.instance.registerOrder(_currentOrder!);
+
     SplitCheckoutDialog.show(
       context,
       order: _currentOrder!,
       onOrderUpdated: (updatedOrder) {
         setState(() {
           _currentOrder = updatedOrder;
+          SessionLedgerService.instance.registerOrder(updatedOrder);
           if (updatedOrder.isFullyPaid) {
             _soundboxAnnouncement =
                 'SETTLED: ₹${updatedOrder.totalAmount.toStringAsFixed(0)} VIA 0% MDR';

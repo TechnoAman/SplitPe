@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splitpe/models/ledger_entry.dart';
+import 'package:splitpe/models/split_order.dart';
 import 'package:splitpe/models/tranche.dart';
 import 'package:splitpe/models/user_profile.dart';
 import 'package:splitpe/services/ledger_exporter.dart';
@@ -267,6 +268,91 @@ void main() {
 
       expect(service.entries.first.status, TrancheStatus.paid);
       expect(service.entries.first.statusLabel, 'PAID (SELF-REPORTED)');
+    });
+
+    test('registers ALL tranches of a split order into the session ledger', () {
+      final service = SessionLedgerService.instance;
+      service.clear();
+
+      final order = SplitOrder(
+        orderId: 'ORD-12345',
+        merchantVpa: 'guptakirana@okhdfcbank',
+        merchantName: 'Gupta Kirana',
+        totalAmount: 4500.0,
+        note: 'Grocery Bill',
+        createdAt: DateTime.now(),
+        tranches: [
+          Tranche(
+            id: 'T-1',
+            orderId: 'ORD-12345',
+            index: 0,
+            amount: 1800.0,
+            upiUri: 'upi://pay?pa=guptakirana@okhdfcbank&am=1800.00',
+          ),
+          Tranche(
+            id: 'T-2',
+            orderId: 'ORD-12345',
+            index: 1,
+            amount: 1500.0,
+            upiUri: 'upi://pay?pa=guptakirana@okhdfcbank&am=1500.00',
+          ),
+          Tranche(
+            id: 'T-3',
+            orderId: 'ORD-12345',
+            index: 2,
+            amount: 1200.0,
+            upiUri: 'upi://pay?pa=guptakirana@okhdfcbank&am=1200.00',
+          ),
+        ],
+      );
+
+      service.registerOrder(order);
+
+      // Verify ALL 3 tranches are present in the ledger
+      expect(service.count, 3);
+      expect(service.totalVolume, 4500.0);
+
+      // Verify individual tranches and initial statuses
+      expect(service.entries[0].trancheIndex, 0);
+      expect(service.entries[0].amount, 1800.0);
+      expect(service.entries[0].status, TrancheStatus.inProgress);
+
+      expect(service.entries[1].trancheIndex, 1);
+      expect(service.entries[1].amount, 1500.0);
+      expect(service.entries[1].status, TrancheStatus.pending);
+
+      expect(service.entries[2].trancheIndex, 2);
+      expect(service.entries[2].amount, 1200.0);
+      expect(service.entries[2].status, TrancheStatus.pending);
+
+      // Marking tranche 0 as paid updates it while preserving tranches 1 and 2
+      service.updateTrancheStatus(
+        trancheIndex: 0,
+        billId: order.hashCode,
+        status: TrancheStatus.paid,
+      );
+
+      expect(service.entries[0].status, TrancheStatus.paid);
+      expect(service.entries[1].status, TrancheStatus.pending);
+      expect(service.entries[2].status, TrancheStatus.pending);
+      expect(service.count, 3);
+
+      // Transition tranche 1 to inProgress
+      service.updateTrancheStatus(
+        trancheIndex: 1,
+        billId: order.hashCode,
+        status: TrancheStatus.inProgress,
+      );
+      order.tranches[0].status = TrancheStatus.paid;
+      order.tranches[1].status = TrancheStatus.inProgress;
+
+      // Re-register order (as happens on dialog state updates)
+      service.registerOrder(order);
+
+      expect(service.entries[0].status, TrancheStatus.paid);
+      expect(service.entries[1].status, TrancheStatus.inProgress);
+      expect(service.entries[2].status, TrancheStatus.pending);
+      expect(service.count, 3);
     });
   });
 

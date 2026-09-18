@@ -197,6 +197,24 @@ class QrTrancheCard extends StatelessWidget {
                       ),
                     ),
 
+                    if (tranche.suggestedDelaySeconds > 0 && !isPaid) ...[
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Icon(Icons.timer_outlined, size: 11, color: AppColors.textSub(context)),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Pacing: ~${tranche.suggestedDelaySeconds}s delay',
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSub(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
                     if (isPaid && tranche.txnRef != null) ...[
                       const SizedBox(height: 6),
                       Text(
@@ -230,7 +248,11 @@ class QrTrancheCard extends StatelessWidget {
                     depth: 3.0,
                     border: Border.all(color: Colors.black, width: 1.5),
                     onTapUp: () async {
-                      final launched = await UpiService.launchUpiIntent(tranche.upiUri);
+                      final launched = await UpiService.launchUpiIntent(
+                        tranche.upiUri,
+                        amount: tranche.amount,
+                        trancheIndex: tranche.index,
+                      );
                       if (!launched) {
                         await UpiService.copyToClipboard(tranche.upiUri);
                         if (context.mounted) {

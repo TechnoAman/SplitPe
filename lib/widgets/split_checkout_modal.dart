@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
+import '../services/session_ledger_service.dart';
 import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
 import 'clout_share_modal.dart';
@@ -65,6 +66,12 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
       tranche.paidAt = DateTime.now();
       tranche.txnRef =
           'TXN${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
+      SessionLedgerService.instance.updateTrancheStatus(
+        trancheIndex: tranche.index,
+        billId: widget.order.hashCode,
+        status: TrancheStatus.paid,
+      );
 
       if (widget.order.isFullyPaid) {
         _confettiController.play();
@@ -294,6 +301,35 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                               color: AppColors.primaryBlue,
                             ),
                           ),
+                          if (currentTranche.suggestedDelaySeconds > 0 && !currentTranche.isPaid) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1B1812) : const Color(0xFFFEF3C7),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF785B18) : const Color(0xFFF59E0B),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.timer_outlined, size: 12, color: Color(0xFFF59E0B)),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Pacing window: ~${currentTranche.suggestedDelaySeconds}s (Anti-burst simulation)',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: isDark ? const Color(0xFFFBBF24) : const Color(0xFFB45309),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
 
                           const SizedBox(height: 20),
 
@@ -304,7 +340,14 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                               height: 48,
                               child: ElevatedButton(
                                 onPressed: () async {
-                                  final launched = await UpiService.launchUpiIntent(currentTranche.upiUri);
+                                  final launched = await UpiService.launchUpiIntent(
+                                    currentTranche.upiUri,
+                                    amount: currentTranche.amount,
+                                    receiverUpiId: order.merchantVpa,
+                                    note: 'Tranche ${_activeStepIndex + 1}/$totalSteps',
+                                    trancheIndex: currentTranche.index,
+                                    billId: order.hashCode,
+                                  );
                                   if (!launched) {
                                     await UpiService.copyToClipboard(currentTranche.upiUri);
                                     if (context.mounted) {

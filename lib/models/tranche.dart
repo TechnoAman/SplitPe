@@ -9,6 +9,7 @@ class Tranche {
   TrancheStatus status;
   DateTime? paidAt;
   String? txnRef;
+  final int suggestedDelaySeconds;
 
   Tranche({
     required this.id,
@@ -19,6 +20,7 @@ class Tranche {
     this.status = TrancheStatus.pending,
     this.paidAt,
     this.txnRef,
+    this.suggestedDelaySeconds = 0,
   });
 
   bool get isPaid => status == TrancheStatus.paid;
@@ -32,6 +34,7 @@ class Tranche {
     TrancheStatus? status,
     DateTime? paidAt,
     String? txnRef,
+    int? suggestedDelaySeconds,
   }) {
     return Tranche(
       id: id ?? this.id,
@@ -42,6 +45,7 @@ class Tranche {
       status: status ?? this.status,
       paidAt: paidAt ?? this.paidAt,
       txnRef: txnRef ?? this.txnRef,
+      suggestedDelaySeconds: suggestedDelaySeconds ?? this.suggestedDelaySeconds,
     );
   }
 }

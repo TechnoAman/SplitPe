@@ -209,6 +209,71 @@ class _GroupSplitViewState extends State<GroupSplitView> {
 
           const SizedBox(height: 14),
 
+          // Per-Person Summary Card
+          if (order != null) ...[
+            NeoPopSurfaceCard(
+              backgroundColor: isDark ? const Color(0xFF0D1B2A) : const Color(0xFFEFF6FF),
+              borderColor: AppColors.primaryBlue,
+              depth: 3.0,
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBlue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'EACH PERSON PAYS',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
+                            color: AppColors.primaryBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '₹${(order.totalAmount / _peopleCount).toStringAsFixed(0)} / person',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.text(context),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF00E676).withAlpha(isDark ? 40 : 25),
+                      border: Border.all(color: const Color(0xFF00E676), width: 0.8),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      '0% MDR',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF00E676),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
           // Quick Share WhatsApp Button
           NeoPopActionButton(
             text: 'SHARE SPLIT LINKS ON WHATSAPP 📲',

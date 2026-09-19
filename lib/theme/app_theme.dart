@@ -32,6 +32,7 @@ class AppColors {
   static const Color electricPurple = Color(0xFF7C4DFF);
   static const Color goldenYellow = Color(0xFFFFD600);
   static const Color alertRed = Color(0xFFFF1744);
+  static const Color profitGreen = Color(0xFF00C853); // Fresh Emerald Profit Green
   static const Color pureWhite = Color(0xFFFFFFFF);
 
   // CRED & Google Typographic Hierarchy
@@ -69,6 +70,8 @@ class AppColors {
       Theme.of(context).brightness == Brightness.dark
           ? textSecondary
           : lightTextSecondary;
+
+  static Color textSubtle(BuildContext context) => textSub(context);
 
   static Color chipBg(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark

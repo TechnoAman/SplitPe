@@ -30,6 +30,10 @@ class IndianNumberFormat {
     return '₹${format(value)}';
   }
 
+  /// Alias for formatRupee
+  static String formatRupees(num? value, {bool showDecimals = false, int decimals = 2}) =>
+      formatRupee(value, showDecimals: showDecimals, decimals: decimals);
+
   /// Parses text that may contain commas and returns double
   static double parseAmount(String? text, [double defaultValue = 0.0]) {
     if (text == null || text.trim().isEmpty) return defaultValue;

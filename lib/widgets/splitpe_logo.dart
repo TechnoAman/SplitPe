@@ -15,10 +15,13 @@ class SplitPeLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
         // 3D NeoPOP High-Res Visual Logo Emblem
         Container(
           width: size + 6,
@@ -101,6 +104,7 @@ class SplitPeLogo extends StatelessWidget {
           ],
         ],
       ],
-    );
-  }
+    ),
+  );
+}
 }

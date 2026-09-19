@@ -3,7 +3,20 @@
     {
       "name": "Default",
       "files": [
-        "README.md"
+        "lib/views/pos_checkout_view.dart",
+        "assets/images/gandhi_currency.png",
+        "lib/main.dart",
+        "lib/services/currency_formatter.dart",
+        "lib/theme/app_theme.dart",
+        "lib/views/group_split_view.dart",
+        "lib/views/home_screen.dart",
+        "lib/widgets/clout_share_modal.dart",
+        "lib/widgets/split_checkout_modal.dart",
+        "lib/widgets/splitpe_logo.dart",
+        "lib/l10n/app_locale.dart",
+        "lib/l10n/app_strings.dart",
+        "lib/widgets/language_selector_modal.dart",
+        "test/localization_test.dart"
       ]
     }
   ],

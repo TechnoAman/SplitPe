@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neopop/neopop.dart';
+import '../l10n/app_strings.dart';
 import '../models/split_order.dart';
 import '../services/currency_formatter.dart';
 import '../services/split_engine.dart';
@@ -31,14 +32,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
   SplitOrder? _currentOrder;
   String? _soundboxAnnouncement;
-  String _selectedPresetTitle = 'CUSTOM BILL';
+  String? _selectedPresetTitle;
 
-  static const List<KiranaPreset> _kiranaPresets = [
-    KiranaPreset(title: 'ATTA & OIL', amount: 2450),
-    KiranaPreset(title: 'DAIRY & GHEE', amount: 3200),
-    KiranaPreset(title: 'DHABA DINNER', amount: 3850),
-    KiranaPreset(title: 'DRY FRUITS', amount: 4500),
-    KiranaPreset(title: 'FULL RATION', amount: 7500),
+  List<KiranaPreset> get _kiranaPresets => [
+    KiranaPreset(title: AppStrings.presetAttaOil, amount: 2450),
+    KiranaPreset(title: AppStrings.presetDairyGhee, amount: 3200),
+    KiranaPreset(title: AppStrings.presetDhabaDinner, amount: 3850),
+    KiranaPreset(title: AppStrings.presetDryFruits, amount: 4500),
+    KiranaPreset(title: AppStrings.presetFullRation, amount: 7500),
   ];
 
   static const List<String> _upiHandles = [
@@ -119,10 +120,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
           ),
           decoration: BoxDecoration(
             color: AppColors.cardBg(context),
-            border: const Border(
-              top: BorderSide(color: AppColors.primaryBlue, width: 2.0),
-            ),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            border: Border.all(color: AppColors.border(context), width: 1.2),
             boxShadow: [
               BoxShadow(
                 color: isDark
@@ -141,7 +140,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'ENTER MERCHANT UPI ID',
+                    AppStrings.enterMerchantUpiId,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
@@ -164,9 +163,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
               const SizedBox(height: 16),
 
               // UPI ID (VPA) Input
-              const Text(
-                'UPI ID (VPA)',
-                style: TextStyle(
+              Text(
+                AppStrings.upiIdVpa,
+                style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.0,
@@ -259,9 +258,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
               const SizedBox(height: 14),
 
               // Store / Merchant Name Input
-              const Text(
-                'MERCHANT / STORE NAME (OPTIONAL)',
-                style: TextStyle(
+              Text(
+                AppStrings.merchantNameOptional,
+                style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.0,
@@ -354,7 +353,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          validation.errorMessage ?? 'Please enter a valid UPI ID (e.g. store@upi)',
+                          validation.errorMessage ??
+                              'Please enter a valid UPI ID (e.g. store@upi)',
                         ),
                         backgroundColor: AppColors.alertRed,
                       ),
@@ -364,7 +364,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
                   setState(() {
                     _vpaController.text = validation.vpa!;
-                    _nameController.text = tempNameController.text.trim().isNotEmpty
+                    _nameController.text =
+                        tempNameController.text.trim().isNotEmpty
                         ? tempNameController.text.trim()
                         : validation.merchantName!;
                     _recalculateOrder();
@@ -372,12 +373,12 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
 
                   Navigator.pop(ctx);
                 },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                   child: Center(
                     child: Text(
-                      'CONFIRM UPI ID ⚡',
-                      style: TextStyle(
+                      AppStrings.saveUpiId,
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.8,
@@ -410,7 +411,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
         totalAmount: amt,
         merchantVpa: vpa,
         merchantName: name,
-        note: _selectedPresetTitle,
+        note: _selectedPresetTitle ?? AppStrings.customBill,
       );
     });
   }
@@ -443,7 +444,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   Widget build(BuildContext context) {
     final order = _currentOrder;
     final amt = IndianNumberFormat.parseAmount(_amountController.text);
-    final baseMdr = (amt <= 2000 ? 0.0 : (amt * 0.004 > 300 ? 300.0 : amt * 0.004));
+    final baseMdr = (amt <= 2000
+        ? 0.0
+        : (amt * 0.004 > 300 ? 300.0 : amt * 0.004));
     final gstFee = baseMdr * 0.18;
     final totalFee = baseMdr + gstFee;
     final standardFee = IndianNumberFormat.formatWithDecimals(totalFee, 2);
@@ -520,8 +523,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                               children: [
                                 Text(
                                   isVpaSet
-                                      ? 'PAYING TO UPI ID'
-                                      : 'MERCHANT UPI ID (REQUIRED)',
+                                      ? AppStrings.payingToUpiId
+                                      : AppStrings.merchantUpiIdRequired,
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w900,
@@ -535,7 +538,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 Text(
                                   isVpaSet
                                       ? '${_nameController.text.toUpperCase()} (${_vpaController.text})'
-                                      : 'TAP TO SET UPI ID / VPA',
+                                      : AppStrings.tapToSetUpiId,
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w900,
@@ -550,10 +553,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 if (isVpaSet) ...[
                                   Builder(
                                     builder: (context) {
-                                      final val = UpiValidator.validate(_vpaController.text);
+                                      final val = UpiValidator.validate(
+                                        _vpaController.text,
+                                      );
                                       if (val.issuerLabel != null) {
                                         return Padding(
-                                          padding: const EdgeInsets.only(top: 2),
+                                          padding: const EdgeInsets.only(
+                                            top: 2,
+                                          ),
                                           child: Row(
                                             children: [
                                               const Icon(
@@ -595,7 +602,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                               ),
                             ),
                             child: Text(
-                              isVpaSet ? 'EDIT ▾' : 'ENTER ▾',
+                              isVpaSet ? 'EDIT ▾' : AppStrings.btnEnter,
                               style: TextStyle(
                                 color: AppColors.text(context),
                                 fontSize: 9,
@@ -656,155 +663,162 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'TOTAL BILL AMOUNT',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1.5,
-                                    color: AppColors.textSub(context),
-                                  ),
-                                ),
-                                const Text(
-                                  'NPCI 0.4% CAP: ₹2,000',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.primaryBlue,
-                                    letterSpacing: 0.8,
-                                  ),
-                                ),
-                              ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              AppStrings.totalBillAmount,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                                color: AppColors.textSub(context),
+                              ),
                             ),
-                            const SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '₹',
-                                  style: TextStyle(
-                                    fontSize: 38,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.text(context),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _amountController,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      IndianCurrencyInputFormatter(allowDecimals: true),
-                                    ],
-                                    style: TextStyle(
-                                      fontSize: 38,
-                                      fontWeight: FontWeight.w900,
-                                      color: AppColors.text(context),
-                                      letterSpacing: -1.0,
-                                    ),
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                      hintText: '0',
-                                      hintStyle: TextStyle(
-                                        color: isDark
-                                            ? const Color(0xFF383B46)
-                                            : const Color(0xFFCBD5E1),
-                                      ),
-                                    ),
-                                    onChanged: (_) {
-                                      _selectedPresetTitle = 'CUSTOM BILL';
-                                      _recalculateOrder();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 14),
-
-                            // CRED NeoPOP Preset Buttons
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: _kiranaPresets.map((preset) {
-                                  final currentVal =
-                                      IndianNumberFormat.parseAmount(_amountController.text);
-                                  final isSelected = currentVal == preset.amount;
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 8),
-                                    child: NeoPopButton(
-                                      color: isSelected
-                                          ? (isDark
-                                                ? Colors.white
-                                                : AppColors.primaryBlue)
-                                          : AppColors.cardElevated(context),
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? (isDark
-                                                  ? Colors.white
-                                                  : AppColors.primaryBlue)
-                                            : AppColors.border(context),
-                                        width: 1.2,
-                                      ),
-                                      depth: 2,
-                                      onTapUp: () {
-                                        _amountController.text =
-                                            IndianNumberFormat.format(preset.amount);
-                                        _selectedPresetTitle = preset.title;
-                                        _recalculateOrder();
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 8,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              preset.title,
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w900,
-                                                letterSpacing: 0.5,
-                                                color: isSelected
-                                                    ? (isDark
-                                                          ? Colors.black
-                                                          : Colors.white)
-                                                    : AppColors.text(context),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              '₹${IndianNumberFormat.format(preset.amount)}',
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w900,
-                                                color: isSelected
-                                                    ? (isDark
-                                                          ? Colors.black
-                                                          : Colors.white)
-                                                    : AppColors.primaryBlue,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
+                            Text(
+                              AppStrings.npciCap,
+                              style: const TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryBlue,
+                                letterSpacing: 0.8,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              '₹',
+                              style: TextStyle(
+                                fontSize: 38,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.text(context),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextField(
+                                controller: _amountController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  IndianCurrencyInputFormatter(
+                                    allowDecimals: true,
+                                  ),
+                                ],
+                                style: TextStyle(
+                                  fontSize: 38,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.text(context),
+                                  letterSpacing: -1.0,
+                                ),
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  hintText: '0',
+                                  hintStyle: TextStyle(
+                                    color: isDark
+                                        ? const Color(0xFF383B46)
+                                        : const Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                                onChanged: (_) {
+                                  _selectedPresetTitle = AppStrings.customBill;
+                                  _recalculateOrder();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        // CRED NeoPOP Preset Buttons
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _kiranaPresets.map((preset) {
+                              final currentVal =
+                                  IndianNumberFormat.parseAmount(
+                                    _amountController.text,
+                                  );
+                              final isSelected =
+                                  currentVal == preset.amount;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: NeoPopButton(
+                                  color: isSelected
+                                      ? (isDark
+                                            ? Colors.white
+                                            : AppColors.primaryBlue)
+                                      : AppColors.cardElevated(context),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? (isDark
+                                              ? Colors.white
+                                              : AppColors.primaryBlue)
+                                        : AppColors.border(context),
+                                    width: 1.2,
+                                  ),
+                                  depth: 2,
+                                  onTapUp: () {
+                                    _amountController.text =
+                                        IndianNumberFormat.format(
+                                          preset.amount,
+                                        );
+                                    _selectedPresetTitle = preset.title;
+                                    _recalculateOrder();
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          preset.title,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 0.5,
+                                            color: isSelected
+                                                ? (isDark
+                                                      ? Colors.black
+                                                      : Colors.white)
+                                                : AppColors.text(context),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          '₹${IndianNumberFormat.format(preset.amount)}',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w900,
+                                            color: isSelected
+                                                ? (isDark
+                                                      ? Colors.black
+                                                      : Colors.white)
+                                                : AppColors.primaryBlue,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
+              ),
+            ),
 
                 const SizedBox(height: 14),
 
@@ -824,7 +838,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'ARBITRAGE BREAKDOWN',
+                              AppStrings.arbitrageBreakdown,
                               style: TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w900,
@@ -833,7 +847,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                               ),
                             ),
                             Text(
-                              'ZERO MDR POLICY',
+                              AppStrings.zeroMdrPolicy,
                               style: TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w800,
@@ -863,7 +877,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'REGULAR GPAY',
+                                      AppStrings.regularGpay,
                                       style: TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.w800,
@@ -874,7 +888,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                     ),
                                     const SizedBox(height: 3),
                                     Text(
-                                      '+₹$standardFee FEE',
+                                      '+₹$standardFee ${AppStrings.feeTag}',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w900,
@@ -882,7 +896,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                       ),
                                     ),
                                     Text(
-                                      '0.4% MDR + 18% GST',
+                                      AppStrings.regularMdrDesc,
                                       style: TextStyle(
                                         fontSize: 7.5,
                                         fontWeight: FontWeight.w600,
@@ -911,29 +925,31 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'SPLITPE (0% MDR)',
-                                      style: TextStyle(
+                                    Text(
+                                      AppStrings.splitpeZeroMdr,
+                                      style: const TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.w800,
                                         color: AppColors.primaryBlue,
                                       ),
                                     ),
                                     const SizedBox(height: 3),
-                                    const Text(
-                                      '₹0.00 (100% FREE)',
-                                      style: TextStyle(
+                                    Text(
+                                      AppStrings.free100Percent,
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w900,
                                         color: AppColors.primaryBlue,
                                       ),
                                     ),
                                     Text(
-                                      '0% MDR · 0% GST',
+                                      AppStrings.zeroMdrGstDesc,
                                       style: TextStyle(
                                         fontSize: 7.5,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.primaryBlue.withAlpha(200),
+                                        color: AppColors.primaryBlue.withAlpha(
+                                          200,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -978,7 +994,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'GANDHIS SAVED (MDR + GST)',
+                                      AppStrings.gandhisSaved,
                                       style: TextStyle(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w900,
@@ -988,8 +1004,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                     ),
                                     Text(
                                       amt <= 2000
-                                          ? 'Transactions ≤ ₹2,000 are already free'
-                                          : 'Saved ₹$baseMdrStr MDR + ₹$gstStr GST (18%)',
+                                          ? AppStrings.under2000Free
+                                          : AppStrings.savingsDesc(baseMdrStr, gstStr),
                                       style: TextStyle(
                                         fontSize: 8,
                                         fontWeight: FontWeight.w600,
@@ -1018,7 +1034,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'DYNAMIC ZERO-MDR TRANCHES',
+                                AppStrings.dynamicTranches,
                                 style: TextStyle(
                                   fontSize: 9,
                                   fontWeight: FontWeight.w900,
@@ -1039,17 +1055,17 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                       color: AppColors.primaryBlue,
                                     ),
                                   ),
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
+                                      const Text(
                                         '🎲',
                                         style: TextStyle(fontSize: 10),
                                       ),
-                                      SizedBox(width: 4),
+                                      const SizedBox(width: 4),
                                       Text(
-                                        'RE-ROLL',
-                                        style: TextStyle(
+                                        AppStrings.reRoll,
+                                        style: const TextStyle(
                                           fontSize: 8.5,
                                           fontWeight: FontWeight.w900,
                                           color: AppColors.primaryBlue,
@@ -1116,14 +1132,14 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                             : const Color(0xFFE2E8F0),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('⚖️', style: TextStyle(fontSize: 10)),
-                        SizedBox(width: 6),
+                        const Text('⚖️', style: TextStyle(fontSize: 10)),
+                        const SizedBox(width: 6),
                         Text(
-                          'FOR EDUCATIONAL & RESEARCH PURPOSES ONLY',
-                          style: TextStyle(
+                          AppStrings.educationalDisclaimer,
+                          style: const TextStyle(
                             fontSize: 8.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.8,
@@ -1154,28 +1170,25 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
             decoration: const NeoPopTiltedButtonDecoration(
               color: AppColors.primaryBlue,
               plunkColor: AppColors.primaryBlueDark,
-              shadowColor: Color(0xFF000000),
+              shadowColor: Color(0xFF003C8F),
               showShimmer: true,
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.bolt, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    isVpaSet
-                        ? 'BYPASS ₹$standardFee FEE · PAY ON UPI'
-                        : 'ENTER UPI ID · PAY ON UPI ⚡',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 1.0,
-                    ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Center(
+                child: Text(
+                  isVpaSet
+                      ? (amt <= 2000
+                            ? AppStrings.enterUpiId
+                            : AppStrings.bypassFeePayUpi(standardFee))
+                      : AppStrings.enterUpiId,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
+                    color: Colors.white,
                   ),
-                ],
+                ),
               ),
             ),
           ),

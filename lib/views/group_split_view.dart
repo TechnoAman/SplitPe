@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neopop/neopop.dart';
 import 'package:share_plus/share_plus.dart';
+import '../l10n/app_strings.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
 import '../services/currency_formatter.dart';
@@ -79,13 +80,13 @@ class _GroupSplitViewState extends State<GroupSplitView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.groups_rounded, color: AppColors.primaryBlue, size: 20),
-                    SizedBox(width: 8),
+                    const Icon(Icons.groups_rounded, color: AppColors.primaryBlue, size: 20),
+                    const SizedBox(width: 8),
                     Text(
-                      'GROUP BILL SPLIT (ZERO MDR)',
-                      style: TextStyle(
+                      AppStrings.groupBillSplit,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.1,
@@ -141,7 +142,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'NUMBER OF FRIENDS:',
+                      AppStrings.numberOfFriends,
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w900,
@@ -217,7 +218,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
 
           // Quick Share WhatsApp Button
           NeoPopActionButton(
-            text: 'SHARE SPLIT LINKS ON WHATSAPP 📲',
+            text: AppStrings.shareOnWhatsapp,
             color: AppColors.primaryBlue,
             textColor: Colors.white,
             prefixIcon: const Icon(Icons.share_rounded, color: Colors.white, size: 16),

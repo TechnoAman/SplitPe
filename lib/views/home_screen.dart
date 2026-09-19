@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_locale.dart';
+import '../l10n/app_strings.dart';
 import '../theme/app_theme.dart';
+import '../widgets/language_selector_modal.dart';
 import '../widgets/splitpe_logo.dart';
 import 'group_split_view.dart';
 import 'pos_checkout_view.dart';
@@ -16,18 +19,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final GlobalKey<PosCheckoutViewState> _posKey = GlobalKey<PosCheckoutViewState>();
-
-  late final List<Widget> _views;
-
-  @override
-  void initState() {
-    super.initState();
-    _views = [
-      PosCheckoutView(key: _posKey),
-      const GroupSplitView(),
-      const SavingsCalculatorView(),
-    ];
-  }
 
   Future<void> _handleTopBarScan() async {
     final result = await Navigator.push<Map<String, String>>(
@@ -54,6 +45,44 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         title: const SplitPeLogo(size: 24),
         actions: [
+          // Language Switcher Button
+          ValueListenableBuilder<AppLanguage>(
+            valueListenable: LocaleController.currentLanguage,
+            builder: (context, lang, _) {
+              return InkWell(
+                onTap: () => LanguageSelectorModal.show(context),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF161820) : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColors.primaryBlue.withAlpha(120),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(lang.flag, style: const TextStyle(fontSize: 12)),
+                      const SizedBox(width: 4),
+                      Text(
+                        lang.shortCode,
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.primaryBlue,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
           IconButton(
             onPressed: _handleTopBarScan,
             icon: Icon(
@@ -87,7 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: IndexedStack(
         index: _currentIndex,
-        children: _views,
+        children: [
+          PosCheckoutView(key: _posKey),
+          const GroupSplitView(),
+          const SavingsCalculatorView(),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -120,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.point_of_sale_rounded,
                 color: AppColors.primaryBlue,
               ),
-              label: 'POS Split',
+              label: AppStrings.navPosSplit,
             ),
             NavigationDestination(
               icon: Icon(
@@ -131,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.group_rounded,
                 color: AppColors.primaryBlue,
               ),
-              label: 'Group Split',
+              label: AppStrings.navGroupSplit,
             ),
             NavigationDestination(
               icon: Icon(
@@ -142,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.calculate_rounded,
                 color: AppColors.primaryBlue,
               ),
-              label: 'MDR Roast',
+              label: AppStrings.navMdrRoast,
             ),
           ],
         ),

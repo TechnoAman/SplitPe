@@ -45,7 +45,9 @@ class CloutShareModal extends StatelessWidget {
           border: Border.all(color: AppColors.border(context), width: 1.0),
           boxShadow: [
             BoxShadow(
-              color: isDark ? Colors.black.withAlpha(160) : Colors.black.withAlpha(25),
+              color: isDark
+                  ? Colors.black.withAlpha(160)
+                  : Colors.black.withAlpha(25),
               blurRadius: 30,
               offset: const Offset(0, 15),
             ),
@@ -64,7 +66,9 @@ class CloutShareModal extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                        color: isDark
+                            ? AppColors.blueSurface
+                            : const Color(0xFFE8F0FE),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: AppColors.primaryBlue.withAlpha(120),
@@ -90,7 +94,11 @@ class CloutShareModal extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close_rounded, color: AppColors.textSub(context), size: 20),
+                  icon: Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textSub(context),
+                    size: 20,
+                  ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -102,7 +110,9 @@ class CloutShareModal extends StatelessWidget {
             // Receipt Container with Banknote Watermark
             Container(
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1A1A1E) : const Color(0xFFF8FAFC),
+                color: isDark
+                    ? const Color(0xFF1A1A1E)
+                    : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border(context)),
               ),
@@ -163,7 +173,10 @@ class CloutShareModal extends StatelessWidget {
                                   ),
                                   Text(
                                     order.merchantVpa,
-                                    style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -171,9 +184,14 @@ class CloutShareModal extends StatelessWidget {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
                               decoration: BoxDecoration(
-                                color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                                color: isDark
+                                    ? AppColors.blueSurface
+                                    : const Color(0xFFE8F0FE),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: const Text(
@@ -198,11 +216,19 @@ class CloutShareModal extends StatelessWidget {
                           children: [
                             Text(
                               'Total Settled',
-                              style: TextStyle(fontSize: 12, color: AppColors.textSub(context), fontWeight: FontWeight.w500),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSub(context),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                             Text(
                               '₹${IndianNumberFormat.formatWithDecimals(order.totalAmount, 2)}',
-                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.text(context)),
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.text(context),
+                              ),
                             ),
                           ],
                         ),
@@ -211,15 +237,26 @@ class CloutShareModal extends StatelessWidget {
 
                         // MDR Saved Highlight
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: isDark ? AppColors.blueSurface : const Color(0xFFE8F0FE),
+                            color: isDark
+                                ? AppColors.blueSurface
+                                : const Color(0xFFE8F0FE),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.primaryBlue.withAlpha(60)),
+                            border: Border.all(
+                              color: AppColors.primaryBlue.withAlpha(60),
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.bolt, color: AppColors.primaryBlue, size: 16),
+                              const Icon(
+                                Icons.bolt,
+                                color: AppColors.primaryBlue,
+                                size: 16,
+                              ),
                               const SizedBox(width: 6),
                               const Expanded(
                                 child: Text(
@@ -253,7 +290,10 @@ class CloutShareModal extends StatelessWidget {
                             const Expanded(
                               child: Text(
                                 '0% MDR Tranching Engine',
-                                style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.textMuted,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -261,7 +301,11 @@ class CloutShareModal extends StatelessWidget {
                             const SizedBox(width: 6),
                             const Text(
                               '0% MDR Certified',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryBlue),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryBlue,
+                              ),
                             ),
                           ],
                         ),
@@ -282,20 +326,35 @@ class CloutShareModal extends StatelessWidget {
                     height: 44,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        launchUrl(Uri.parse(twitterUrl), mode: LaunchMode.externalApplication);
+                        launchUrl(
+                          Uri.parse(twitterUrl),
+                          mode: LaunchMode.externalApplication,
+                        );
                       },
-                      icon: Icon(Icons.send_rounded, size: 14, color: isDark ? Colors.black : Colors.white),
+                      icon: Icon(
+                        Icons.send_rounded,
+                        size: 14,
+                        color: isDark ? Colors.black : Colors.white,
+                      ),
                       label: Text(
                         'Post on X',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: isDark ? Colors.black : Colors.white),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.black : Colors.white,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark ? Colors.white : const Color(0xFF1E293B),
+                        backgroundColor: isDark
+                            ? Colors.white
+                            : const Color(0xFF1E293B),
                         foregroundColor: isDark ? Colors.black : Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
@@ -306,15 +365,24 @@ class CloutShareModal extends StatelessWidget {
                     height: 44,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        final msg = '⚡ Just settled a ₹${IndianNumberFormat.format(order.totalAmount)} bill with ₹0 MDR using SplitPe!\n'
+                        final msg =
+                            '⚡ Just settled a ₹${IndianNumberFormat.format(order.totalAmount)} bill with ₹0 MDR using SplitPe!\n'
                             'Saved ₹${IndianNumberFormat.formatWithDecimals(order.mdrSavings, 2)} in gateway fees.\n'
                             'Check out SplitPe!';
                         SharePlus.instance.share(ShareParams(text: msg));
                       },
-                      icon: const Icon(Icons.share_rounded, size: 14, color: Colors.white),
+                      icon: const Icon(
+                        Icons.share_rounded,
+                        size: 14,
+                        color: Colors.white,
+                      ),
                       label: const Text(
                         'WhatsApp',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -322,7 +390,9 @@ class CloutShareModal extends StatelessWidget {
                         backgroundColor: AppColors.primaryBlue,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),

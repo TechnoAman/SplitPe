@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../l10n/app_strings.dart';
 import '../theme/app_theme.dart';
 import '../widgets/neopop_components.dart';
 
@@ -58,17 +59,17 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    NeoPopPillBadge(
+                    const NeoPopPillBadge(
                       label: '0.4% MDR ROAST 🔥',
                       color: AppColors.alertRed,
                       textColor: Colors.white,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
-                      'Arbitrage Engine',
-                      style: TextStyle(
+                      AppStrings.arbitrageEngine,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primaryBlue,
@@ -78,7 +79,7 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'HOW MUCH DOES THE NEW MDR COST YOUR BUSINESS?',
+                  AppStrings.savingsTitle,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -106,7 +107,7 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'MONTHLY UPI TURNOVER',
+                      AppStrings.monthlyUpiTurnover,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
@@ -153,7 +154,7 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'AVERAGE TICKET / BILL SIZE',
+                      AppStrings.avgTicketSize,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
@@ -213,9 +214,9 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'ANNUAL GATEWAY LOSS',
-                        style: TextStyle(
+                      Text(
+                        AppStrings.annualLossDrain,
+                        style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.8,
@@ -259,9 +260,9 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'SPLITPE SAVINGS',
-                        style: TextStyle(
+                      Text(
+                        AppStrings.splitpeZeroMdr,
+                        style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.8,

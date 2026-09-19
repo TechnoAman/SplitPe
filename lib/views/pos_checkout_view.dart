@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neopop/neopop.dart';
 import '../models/split_order.dart';
+import '../services/currency_formatter.dart';
 import '../services/split_engine.dart';
 import '../services/upi_validator.dart';
 import '../theme/app_theme.dart';
@@ -24,7 +25,7 @@ class PosCheckoutView extends StatefulWidget {
 }
 
 class PosCheckoutViewState extends State<PosCheckoutView> {
-  final _amountController = TextEditingController(text: '3850');
+  final _amountController = TextEditingController(text: '3,850');
   final _vpaController = TextEditingController(text: '');
   final _nameController = TextEditingController(text: '');
 
@@ -77,7 +78,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
       if (am.isNotEmpty &&
           double.tryParse(am) != null &&
           double.parse(am) > 0) {
-        _amountController.text = double.parse(am).toStringAsFixed(0);
+        _amountController.text = IndianNumberFormat.format(double.parse(am));
       }
       _recalculateOrder();
     });
@@ -394,7 +395,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   }
 
   void _recalculateOrder() {
-    final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
+    final amt = IndianNumberFormat.parseAmount(_amountController.text);
     if (amt <= 0) return;
 
     final vpa = _vpaController.text.trim().isNotEmpty
@@ -431,7 +432,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
           _currentOrder = updatedOrder;
           if (updatedOrder.isFullyPaid) {
             _soundboxAnnouncement =
-                'SETTLED: ₹${updatedOrder.totalAmount.toStringAsFixed(0)} VIA 0% MDR';
+                'SETTLED: ₹${IndianNumberFormat.format(updatedOrder.totalAmount)} VIA 0% MDR';
           }
         });
       },
@@ -441,13 +442,13 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
   @override
   Widget build(BuildContext context) {
     final order = _currentOrder;
-    final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
+    final amt = IndianNumberFormat.parseAmount(_amountController.text);
     final baseMdr = (amt <= 2000 ? 0.0 : (amt * 0.004 > 300 ? 300.0 : amt * 0.004));
     final gstFee = baseMdr * 0.18;
     final totalFee = baseMdr + gstFee;
-    final standardFee = totalFee.toStringAsFixed(2);
-    final baseMdrStr = baseMdr.toStringAsFixed(2);
-    final gstStr = gstFee.toStringAsFixed(2);
+    final standardFee = IndianNumberFormat.formatWithDecimals(totalFee, 2);
+    final baseMdrStr = IndianNumberFormat.formatWithDecimals(baseMdr, 2);
+    final gstStr = IndianNumberFormat.formatWithDecimals(gstFee, 2);
     final isVpaSet = _vpaController.text.trim().isNotEmpty;
     final isDark = ThemeController.isDark(context);
 
@@ -695,6 +696,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   child: TextField(
                                     controller: _amountController,
                                     keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      IndianCurrencyInputFormatter(allowDecimals: true),
+                                    ],
                                     style: TextStyle(
                                       fontSize: 38,
                                       fontWeight: FontWeight.w900,
@@ -728,9 +732,9 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                               scrollDirection: Axis.horizontal,
                               child: Row(
                                 children: _kiranaPresets.map((preset) {
-                                  final isSelected =
-                                      _amountController.text ==
-                                      preset.amount.toStringAsFixed(0);
+                                  final currentVal =
+                                      IndianNumberFormat.parseAmount(_amountController.text);
+                                  final isSelected = currentVal == preset.amount;
                                   return Padding(
                                     padding: const EdgeInsets.only(right: 8),
                                     child: NeoPopButton(
@@ -749,8 +753,8 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                       ),
                                       depth: 2,
                                       onTapUp: () {
-                                        _amountController.text = preset.amount
-                                            .toStringAsFixed(0);
+                                        _amountController.text =
+                                            IndianNumberFormat.format(preset.amount);
                                         _selectedPresetTitle = preset.title;
                                         _recalculateOrder();
                                       },
@@ -776,7 +780,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                             ),
                                             const SizedBox(width: 6),
                                             Text(
-                                              '₹${preset.amount.toStringAsFixed(0)}',
+                                              '₹${IndianNumberFormat.format(preset.amount)}',
                                               style: TextStyle(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w900,
@@ -1077,7 +1081,7 @@ class PosCheckoutViewState extends State<PosCheckoutView> {
                                   ),
                                 ),
                                 child: Text(
-                                  '#${t.index}: ₹${t.amount.toStringAsFixed(0)}',
+                                  '#${t.index}: ₹${IndianNumberFormat.format(t.amount)}',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w800,

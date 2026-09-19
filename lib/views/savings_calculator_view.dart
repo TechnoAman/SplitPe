@@ -32,9 +32,9 @@ class _SavingsCalculatorViewState extends State<SavingsCalculatorView> {
 
   String get _roastCommentary {
     if (_annualMdrLoss >= 100000) {
-      return '💸 You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr (MDR + 18% GST)! That is literally a brand new M3 MacBook Pro or a Bali trip funded for payment gateways.';
+      return '💸 You are losing ${_currencyFormat.format(_annualMdrLoss)}/yr (MDR + 18% GST)! That is literally a brand new M3 MacBook Pro or a Bali trip funded for payment gateways.';
     } else if (_annualMdrLoss >= 30000) {
-      return '☕ You are losing ₹${_currencyFormat.format(_annualMdrLoss)}/yr (MDR + 18% GST)! That is 1,500 cups of premium filter coffee down the drain.';
+      return '☕ You are losing ${_currencyFormat.format(_annualMdrLoss)}/yr (MDR + 18% GST)! That is 1,500 cups of premium filter coffee down the drain.';
     } else {
       return '🛡️ SplitPe shields every single rupee with compliant sub-₹2,000 tranche routing (Zero MDR & Zero GST).';
     }

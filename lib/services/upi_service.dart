@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'currency_formatter.dart';
 
 class UpiService {
   /// Launches UPI intent URI (opens Google Pay, PhonePe, Paytm, etc. on mobile)
@@ -38,7 +39,7 @@ class UpiService {
     required double mdrSaved,
     required int trancheCount,
   }) {
-    return '⚡ Saved ₹${mdrSaved.toStringAsFixed(2)} MDR on a ₹${totalAmount.toStringAsFixed(0)} bill using @SplitPe!\n\n'
+    return '⚡ Saved ₹${IndianNumberFormat.formatWithDecimals(mdrSaved, 2)} MDR on a ₹${IndianNumberFormat.format(totalAmount)} bill using @SplitPe!\n\n'
         'Split into $trancheCount sub-₹2,000 tranches to pay 0% MDR fee legally! 🚀\n'
         '#UPI #Fintech #SplitPe #ZeroMDR';
   }
@@ -50,7 +51,8 @@ class UpiService {
     required double amount,
     required String upiUri,
   }) {
-    return 'Hey $payerName, your share for $merchantName is ₹${amount.toStringAsFixed(2)}.\n'
+    return 'Hey $payerName, your share for $merchantName is ₹${IndianNumberFormat.formatWithDecimals(amount, 2)}.\n'
         'Click to pay via UPI (0% MDR): $upiUri';
   }
 }
+

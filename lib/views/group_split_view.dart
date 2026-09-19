@@ -3,6 +3,7 @@ import 'package:neopop/neopop.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
+import '../services/currency_formatter.dart';
 import '../services/split_engine.dart';
 import '../theme/app_theme.dart';
 import '../widgets/neopop_components.dart';
@@ -16,7 +17,7 @@ class GroupSplitView extends StatefulWidget {
 }
 
 class _GroupSplitViewState extends State<GroupSplitView> {
-  final _amountController = TextEditingController(text: '6800');
+  final _amountController = TextEditingController(text: '6,800');
   int _peopleCount = 4;
   final List<String> _friendNames = ['You', 'Rohit', 'Sneha', 'Vikram', 'Pooja', 'Ananya', 'Aarav'];
   SplitOrder? _groupOrder;
@@ -34,7 +35,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
   }
 
   void _recalculateGroup() {
-    final amt = double.tryParse(_amountController.text.trim()) ?? 0.0;
+    final amt = IndianNumberFormat.parseAmount(_amountController.text);
     if (amt <= 0) return;
 
     setState(() {
@@ -50,9 +51,10 @@ class _GroupSplitViewState extends State<GroupSplitView> {
 
   void _shareAllViaWhatsApp() {
     if (_groupOrder == null) return;
-    final perPerson = (_groupOrder!.totalAmount / _peopleCount).toStringAsFixed(2);
+    final perPerson = IndianNumberFormat.formatWithDecimals(_groupOrder!.totalAmount / _peopleCount, 2);
+    final totalFormatted = IndianNumberFormat.format(_groupOrder!.totalAmount);
     final msg = '🍻 Dinner Bill Split on SplitPe (0% MDR)!\n'
-        'Total: ₹${_groupOrder!.totalAmount.toStringAsFixed(0)} | Friends: $_peopleCount\n'
+        'Total: ₹$totalFormatted | Friends: $_peopleCount\n'
         'Share per person: ₹$perPerson\n\n'
         'Pay your share directly via UPI without any surcharge!';
     SharePlus.instance.share(ShareParams(text: msg));
@@ -110,6 +112,9 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                       child: TextField(
                         controller: _amountController,
                         keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          IndianCurrencyInputFormatter(allowDecimals: true),
+                        ],
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
@@ -122,6 +127,7 @@ class _GroupSplitViewState extends State<GroupSplitView> {
                             color: isDark ? const Color(0xFF383B46) : const Color(0xFFCBD5E1),
                           ),
                         ),
+                        onChanged: (_) => _recalculateGroup(),
                         onSubmitted: (_) => _recalculateGroup(),
                       ),
                     ),

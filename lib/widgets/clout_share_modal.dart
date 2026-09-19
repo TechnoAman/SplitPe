@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/split_order.dart';
+import '../services/currency_formatter.dart';
 import '../theme/app_theme.dart';
 
 class CloutShareModal extends StatelessWidget {
@@ -21,9 +22,9 @@ class CloutShareModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tweetText = Uri.encodeComponent(
-      '🔥 Just settled a ₹${order.totalAmount.toStringAsFixed(0)} bill with ₹0 MDR using @SplitPe!\n\n'
+      '🔥 Just settled a ₹${IndianNumberFormat.format(order.totalAmount)} bill with ₹0 MDR using @SplitPe!\n\n'
       '⚡ Split into ${order.tranches.length} sub-₹2,000 tranches.\n'
-      '💰 Net MDR + GST Surcharge Paid: ₹0.00 (Saved ₹${order.mdrSavings.toStringAsFixed(2)})\n\n'
+      '💰 Net MDR + GST Surcharge Paid: ₹0.00 (Saved ₹${IndianNumberFormat.formatWithDecimals(order.mdrSavings, 2)})\n\n'
       '100% Compliant #UPI #Fintech #SplitPe #ZeroMDR',
     );
 
@@ -200,7 +201,7 @@ class CloutShareModal extends StatelessWidget {
                               style: TextStyle(fontSize: 12, color: AppColors.textSub(context), fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              '₹${order.totalAmount.toStringAsFixed(2)}',
+                              '₹${IndianNumberFormat.formatWithDecimals(order.totalAmount, 2)}',
                               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.text(context)),
                             ),
                           ],
@@ -234,7 +235,7 @@ class CloutShareModal extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                '+₹${order.mdrSavings.toStringAsFixed(2)}',
+                                '+₹${IndianNumberFormat.formatWithDecimals(order.mdrSavings, 2)}',
                                 style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w800,
@@ -305,8 +306,8 @@ class CloutShareModal extends StatelessWidget {
                     height: 44,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        final msg = '⚡ Just settled a ₹${order.totalAmount.toStringAsFixed(0)} bill with ₹0 MDR using SplitPe!\n'
-                            'Saved ₹${order.mdrSavings.toStringAsFixed(2)} in gateway fees.\n'
+                        final msg = '⚡ Just settled a ₹${IndianNumberFormat.format(order.totalAmount)} bill with ₹0 MDR using SplitPe!\n'
+                            'Saved ₹${IndianNumberFormat.formatWithDecimals(order.mdrSavings, 2)} in gateway fees.\n'
                             'Check out SplitPe!';
                         SharePlus.instance.share(ShareParams(text: msg));
                       },

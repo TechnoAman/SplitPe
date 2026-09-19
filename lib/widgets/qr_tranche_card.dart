@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:neopop/neopop.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/tranche.dart';
+import '../services/currency_formatter.dart';
 import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
 import 'neopop_components.dart';
@@ -163,7 +164,7 @@ class QrTrancheCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '₹${tranche.amount.toStringAsFixed(2)}',
+                      '₹${IndianNumberFormat.formatWithDecimals(tranche.amount, 2)}',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,

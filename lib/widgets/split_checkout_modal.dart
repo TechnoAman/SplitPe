@@ -3,6 +3,7 @@ import 'package:confetti/confetti.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../models/split_order.dart';
 import '../models/tranche.dart';
+import '../services/currency_formatter.dart';
 import '../services/upi_service.dart';
 import '../theme/app_theme.dart';
 import 'clout_share_modal.dart';
@@ -277,7 +278,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
 
                           // 4. Hero Amount
                           Text(
-                            '₹${currentTranche.amount.toStringAsFixed(2)}',
+                            '₹${IndianNumberFormat.formatWithDecimals(currentTranche.amount, 2)}',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w900,
@@ -327,7 +328,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                                   ),
                                 ),
                                 child: Text(
-                                  'Pay ₹${currentTranche.amount.toStringAsFixed(0)} via UPI',
+                                  'Pay ₹${IndianNumberFormat.format(currentTranche.amount)} via UPI',
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
@@ -419,7 +420,7 @@ class _SplitCheckoutDialogState extends State<SplitCheckoutDialog> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '₹${order.totalAmount.toStringAsFixed(0)} settled across $totalSteps tranches with zero MDR fee.\nYou retained all your hard-earned Gandhis 💸',
+                            '₹${IndianNumberFormat.format(order.totalAmount)} settled across $totalSteps tranches with zero MDR fee.\nYou retained all your hard-earned Gandhis 💸',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,
